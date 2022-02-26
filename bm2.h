@@ -1,27 +1,32 @@
 /*
-	“ú—§ƒx[ƒVƒbƒNƒ}ƒXƒ^[Jr.(MB-6885)ƒGƒ~ƒ…ƒŒ[ƒ^ ƒwƒbƒ_
+	æ—¥ç«‹ãƒ™ãƒ¼ã‚·ãƒƒã‚¯ãƒã‚¹ã‚¿ãƒ¼Jr.(MB-6885)ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿ ãƒ˜ãƒƒãƒ€
 */
 
 #ifndef BM2_H
 
 #include <stdio.h>
 #include <limits.h>
+#include "test.h"
+#ifdef CURMPU
 #include "m6800.h"
+#else
+#include "m68alt.h"
+#endif
 #include "srecord.h"
 #include "conf.h"
 #include "depend.h"
 
-/* ^‹U */
-#define FALSE	0	/* ‹U */
-#define TRUE	1	/* ^ */
+/* çœŸå½ */
+#define FALSE	0	/* å½ */
+#define TRUE	1	/* çœŸ */
 
-/* ƒtƒ@ƒCƒ‹‘I‘ğ‚ÌƒtƒBƒ‹ƒ^ */
+/* ãƒ•ã‚¡ã‚¤ãƒ«é¸æŠã®ãƒ•ã‚£ãƒ«ã‚¿ */
 #define FILTER_TAPE	0x0001
 #define FILTER_SOUND	0x0002
 #define FILTER_BINARY	0x0004
 #define FILTER_TEXT	0x0008
 
-/* MB-6885‚Ì‰¼‘zƒL[ƒR[ƒh */
+/* MB-6885ã®ä»®æƒ³ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ */
 #define BMKEY_NONE	0x00
 #define BMKEY_Z	0x10
 #define BMKEY_X	0x11
@@ -74,79 +79,83 @@
 #define BMKEY_MINUS	0x8a
 #define BMKEY_CARET	0x8b
 #define BMKEY_YEN	0x8c
-#define BMKEY_ALPHA	0x0110	/* ‰p” */
-#define BMKEY_ASHIFT	0x0120	/* ‰p‹L† */
-#define BMKEY_KSHIFT	0x0140	/* ƒJƒi‹L† */
-#define BMKEY_KANA	0x0180	/* ƒJƒi */
+#define BMKEY_ALPHA	0x0110	/* è‹±æ•° */
+#define BMKEY_ASHIFT	0x0120	/* è‹±è¨˜å· */
+#define BMKEY_KSHIFT	0x0140	/* ã‚«ãƒŠè¨˜å· */
+#define BMKEY_KANA	0x0180	/* ã‚«ãƒŠ */
 #define BMKEY_BREAK	0x0200	/* BREAK RESET */
-#define BMKEY_OVERWRITE	0x0201	/* Šª‚«–ß‚µ */
-#define BMKEY_APPEND	0x0202	/* ‘‘—‚è */
+#define BMKEY_OVERWRITE	0x0201	/* å·»ãæˆ»ã— */
+#define BMKEY_APPEND	0x0202	/* æ—©é€ã‚Š */
 
-/* ƒGƒ~ƒ…ƒŒ[ƒ^‚Ìó‘Ô */
+/* ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿ã®çŠ¶æ…‹ */
 struct Bm2stat {
 	/* CPU */
-	struct M68stat cpu;		/* CPU‚Ìó‘Ô */
-	int cpu_freq;			/* CPU‚ÌƒNƒƒbƒN”(Hz) */
+	struct M68stat cpu;		/* CPUã®çŠ¶æ…‹ */
+	int cpu_freq;			/* CPUã®ã‚¯ãƒ­ãƒƒã‚¯æ•°(Hz) */
 
-	/* ƒƒ‚ƒŠ */
-	uint8 memory[0x10000];		/* ƒƒ‚ƒŠ */
-	uint8 ram_rom;			/* RAM/ROM‚Ì‘I‘ğ */
-	uint16 ram_end;			/* RAMƒGƒŠƒA‚ÌÅIƒAƒhƒŒƒX */
+	/* ãƒ¡ãƒ¢ãƒª */
+	uint8 memory[0x10000];		/* ãƒ¡ãƒ¢ãƒª */
+	uint8 ram_rom;			/* RAM/ROMã®é¸æŠ */
+	uint16 ram_end;			/* RAMã‚¨ãƒªã‚¢ã®æœ€çµ‚ã‚¢ãƒ‰ãƒ¬ã‚¹ */
 
 	/* RAM */
-	uint8 ram_b000_e7ff[0x3800];	/* RAM $B000`$E7FF */
-	uint8 ram_f000_ffff[0x1000];	/* RAM $F000`$FFFF */
+	uint8 ram_b000_e7ff[0x3800];	/* RAM $B000ã€œ$E7FF */
+	uint8 ram_f000_ffff[0x1000];	/* RAM $F000ã€œ$FFFF */
 
 	/* ROM */
-	uint8 rom_b000_e7ff[0x3800];	/* BASICEƒvƒŠƒ“ƒ^ROM */
-	uint8 rom_f000_ffff[0x1000];	/* ƒ‚ƒjƒ^ROM */
-	uint8 rom_font[0x100][8];	/* ƒtƒHƒ“ƒg */
+	uint8 rom_b000_e7ff[0x3800];	/* BASICãƒ»ãƒ—ãƒªãƒ³ã‚¿ROM */
+	uint8 rom_f000_ffff[0x1000];	/* ãƒ¢ãƒ‹ã‚¿ROM */
+	uint8 rom_font[0x100][8];	/* ãƒ•ã‚©ãƒ³ãƒˆ */
 
-	/* ƒXƒNƒŠ[ƒ“ */
-	uint8 screen_mode;		/* ƒXƒNƒŠ[ƒ“ƒ‚[ƒh */
-	uint8 reverse;			/* ”½“]ó‘Ô */
-	int zoom;			/* ‰æ–Ê‚Ì”{—¦ */
+	/* ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ */
+	uint8 screen_mode;		/* ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒ¢ãƒ¼ãƒ‰ */
+	uint8 reverse;			/* åè»¢çŠ¶æ…‹ */
+	int zoom;			/* ç”»é¢ã®å€ç‡ */
 
-	/* ƒL[ */
-	uint8 key_strobe;		/* ƒL[ƒXƒgƒ[ƒu */
-	uint8 key_mod;			/* ƒL[ƒ‚ƒfƒtƒ@ƒCƒA */
-	uint8 key_mat[256];		/* ƒL[ó‘Ô */
-	uint8 key_break;		/* BREAKƒL[ó‘Ô */
-	int keyconv[KEY_LAST + 1];	/* PC¨MB-6885ƒL[•ÏŠ·•\ */
+	/* ã‚­ãƒ¼ */
+	uint8 key_strobe;		/* ã‚­ãƒ¼ã‚¹ãƒˆãƒ­ãƒ¼ãƒ– */
+	uint8 key_mod;			/* ã‚­ãƒ¼ãƒ¢ãƒ‡ãƒ•ã‚¡ã‚¤ã‚¢ */
+	uint8 key_mat[256];		/* ã‚­ãƒ¼çŠ¶æ…‹ */
+	uint8 key_break;		/* BREAKã‚­ãƒ¼çŠ¶æ…‹ */
+	int keyconv[KEY_LAST + 1];	/* PCâ†’MB-6885ã‚­ãƒ¼å¤‰æ›è¡¨ */
 
-	/* ƒe[ƒv */
-	char tape_path[PATH_MAX];	/* ƒe[ƒvƒtƒ@ƒCƒ‹ƒpƒX–¼ */
-	int tape_mode;			/* ƒe[ƒvƒ‚[ƒh */
-#define TAPE_MODE_APPEND	0	/* ’Ç‰Á */
-#define TAPE_MODE_OVERWRITE	1	/* ã‘‚« */
-#define TAPE_MODE_READONLY	2	/* ‘‚İ‹Ö~ */
+	/* ãƒ†ãƒ¼ãƒ— */
+	char tape_path[PATH_MAX];	/* ãƒ†ãƒ¼ãƒ—ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹å */
+	int tape_mode;			/* ãƒ†ãƒ¼ãƒ—ãƒ¢ãƒ¼ãƒ‰ */
+#define TAPE_MODE_APPEND	0	/* è¿½åŠ  */
+#define TAPE_MODE_OVERWRITE	1	/* ä¸Šæ›¸ã */
+#define TAPE_MODE_READONLY	2	/* æ›¸è¾¼ã¿ç¦æ­¢ */
 	
-	/* ‰¹º */
-	int sound_sample_size;		/* ‰¹º1/60•b‚ ‚½‚è‚Ìbyte” */
-	int sound_buffer_size;		/* ‰¹ºƒoƒbƒtƒ@‚ÌƒTƒCƒY */
-	uint8 *sound_buffer;		/* ‰¹ºƒoƒbƒtƒ@ */
-	uint8 *sound_read_pointer;	/* ‰¹º“Ç‚İ‚İƒ|ƒCƒ“ƒ^ */
-	uint8 *sound_write_pointer;	/* ‰¹º‘‚«‚İƒ|ƒCƒ“ƒ^ */
-	int sound_tape;			/* ƒe[ƒvo—Í‚©? */
-	int use_sound;			/* ‰¹º‚ğo—Í‚·‚é‚©? */
+	/* éŸ³å£° */
+	int sound_sample_size;		/* éŸ³å£°1/60ç§’ã‚ãŸã‚Šã®byteæ•° */
+	int sound_buffer_size;		/* éŸ³å£°ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º */
+	uint8 *sound_buffer;		/* éŸ³å£°ãƒãƒƒãƒ•ã‚¡ */
+	uint8 *sound_read_pointer;	/* éŸ³å£°èª­ã¿è¾¼ã¿ãƒã‚¤ãƒ³ã‚¿ */
+	uint8 *sound_write_pointer;	/* éŸ³å£°æ›¸ãè¾¼ã¿ãƒã‚¤ãƒ³ã‚¿ */
+	int sound_tape;			/* ãƒ†ãƒ¼ãƒ—å‡ºåŠ›ã‹? */
+	int use_sound;			/* éŸ³å£°ã‚’å‡ºåŠ›ã™ã‚‹ã‹? */
 
-	/* ƒfƒBƒXƒvƒŒƒC */
-	uint32 display;			/* ƒfƒBƒXƒvƒŒƒC‚Ìí—Ş */
+	/* ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ */
+	uint32 display;			/* ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ç¨®é¡ */
 
-	/* ƒJƒ‰[ƒAƒ_ƒvƒ^ */
-	int mp1710;			/* ƒJƒ‰[ƒAƒ_ƒvƒ^‚ª‚ ‚é‚©? */
-	int mp1710on;			/* ƒJƒ‰[ƒAƒ_ƒvƒ^‚ª—LŒø‚©? */
-	uint8 colreg;			/* •¶šF */
-	uint8 bckreg;			/* ”wŒiF */
-	uint8 wtenbl;			/* ƒJƒ‰[‚©? */
-	uint8 color_map[32 * 24];	/* ƒJƒ‰[ƒ}ƒbƒv */
+	/* ã‚«ãƒ©ãƒ¼ã‚¢ãƒ€ãƒ—ã‚¿ */
+	int mp1710;			/* ã‚«ãƒ©ãƒ¼ã‚¢ãƒ€ãƒ—ã‚¿ãŒã‚ã‚‹ã‹? */
+	int mp1710on;			/* ã‚«ãƒ©ãƒ¼ã‚¢ãƒ€ãƒ—ã‚¿ãŒæœ‰åŠ¹ã‹? */
+	uint8 colreg;			/* æ–‡å­—è‰² */
+	uint8 bckreg;			/* èƒŒæ™¯è‰² */
+	uint8 wtenbl;			/* ã‚«ãƒ©ãƒ¼ã‹? */
+	uint8 color_map[32 * 24];	/* ã‚«ãƒ©ãƒ¼ãƒãƒƒãƒ— */
 
-	/* ‚»‚Ì‘¼ */
-	int fast;			/* ‚‘¬‚©? */
-	int io_freq;			/* I/OXVüŠú */
-	int menu;			/* ƒƒjƒ…[‚©? */
-	int full_line;			/* ‘Sƒ‰ƒCƒ“•\¦‚©? */
+	/* ãã®ä»– */
+	int fast;			/* é«˜é€Ÿã‹? */
+	int io_freq;			/* I/Oæ›´æ–°å‘¨æœŸ */
+	int menu;			/* ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã‹? */
+	int full_line;			/* å…¨ãƒ©ã‚¤ãƒ³è¡¨ç¤ºã‹? */
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* menu.c */
 int inputFileName(struct Bm2stat *, char *, unsigned int);
@@ -154,6 +163,7 @@ void menu(struct Bm2stat *);
 
 /* init.c */
 int init(struct Bm2stat *, int, char *[]);
+void loadBinary(struct Bm2stat *bm2);
 
 /* bm2sub.c */
 void locate(struct Bm2stat *, int, int);
@@ -187,6 +197,14 @@ void updateCaption(const struct Bm2stat *);
 void popup(const char *, ...);
 int loadFontBmp(struct Bm2stat *, const char *);
 int initDepend(const struct Bm2stat *, int, char *[]);
+
+void reset(struct Bm2stat *bm2);
+int m68states(const struct M68stat *m68);
+int m68diff(int x, int y);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

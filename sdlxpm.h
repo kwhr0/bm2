@@ -1,5 +1,5 @@
 /*
-	XPM‚©‚çSDL_Surface‚ğ¶¬‚·‚é (sdlxpm.h)
+	XPMã‹ã‚‰SDL_Surfaceã‚’ç”Ÿæˆã™ã‚‹ (sdlxpm.h)
 */
 
 #ifndef SDLXPM_H

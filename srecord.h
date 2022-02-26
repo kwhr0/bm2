@@ -1,5 +1,5 @@
 /*
-	Motorola SƒŒƒR[ƒhˆ— ƒwƒbƒ_ (srecord.h)
+	Motorola Sãƒ¬ã‚³ãƒ¼ãƒ‰å‡¦ç† ãƒ˜ãƒƒãƒ€ (srecord.h)
 */
 
 #if !defined(SRECORD_H)

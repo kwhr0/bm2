@@ -1,11 +1,12 @@
 /*
-	“ú—§ƒx[ƒVƒbƒNƒ}ƒXƒ^[Jr.ƒGƒ~ƒ…ƒŒ[ƒ^
-	ƒe[ƒv, ‰¹º
+	æ—¥ç«‹ãƒ™ãƒ¼ã‚·ãƒƒã‚¯ãƒã‚¹ã‚¿ãƒ¼Jr.ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿
+	ãƒ†ãƒ¼ãƒ—, éŸ³å£°
 */
 
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "bm2.h"
@@ -14,21 +15,21 @@
 #	define O_BINARY	0
 #endif
 
-static uint8 tapeReadBuffer[0x10000];	/* ƒe[ƒv“Ç‚İ‚İƒoƒbƒtƒ@ */
-static int tapeReadPos = 0;	/* ƒe[ƒv‚Ì“Ç‚İ‚İˆÊ’u */
-static int tapeReadBufferSize = -1;	/* ƒe[ƒv“Çƒoƒbƒtƒ@ƒTƒCƒY */
-static int tapeReadStartStates;	/* ƒe[ƒv‚Ì“Ç‚İ‚İ‚ğŠJn‚µ‚½“_‚Ì—İÏƒXƒe[ƒg” */
+static uint8 tapeReadBuffer[0x10000];	/* ãƒ†ãƒ¼ãƒ—èª­ã¿è¾¼ã¿ãƒãƒƒãƒ•ã‚¡ */
+static int tapeReadPos = 0;	/* ãƒ†ãƒ¼ãƒ—ã®èª­ã¿è¾¼ã¿ä½ç½® */
+static int tapeReadBufferSize = -1;	/* ãƒ†ãƒ¼ãƒ—èª­è¾¼ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º */
+static int tapeReadStartStates;	/* ãƒ†ãƒ¼ãƒ—ã®èª­ã¿è¾¼ã¿ã‚’é–‹å§‹ã—ãŸæ™‚ç‚¹ã®ç´¯ç©ã‚¹ãƒ†ãƒ¼ãƒˆæ•° */
 
-static uint8 tapeWriteBuffer[0x10000];	/* ƒe[ƒv‘ƒoƒbƒtƒ@ */
-static int tapeWritePos;	/* ƒe[ƒv‘‚«‚İˆÊ’u */
-static int tapeWriteLastStates;	/* ÅŒã‚É‘‚«‚ñ‚¾“_‚Ì—İÏƒXƒe[ƒg” */
-static int tapeWriteTotalStates;	/* 1ƒrƒbƒg‚Ì‘‚«‚İ‚ğŠJn‚µ‚½“_‚©‚ç‚Ì—İÏƒXƒe[ƒg” */
-static int tapeWriteChangeCount;	/* ‘‚«‚İ‚Ìƒrƒbƒg‚ª•Ï‰»‚µ‚½‰ñ” */
+static uint8 tapeWriteBuffer[0x10000];	/* ãƒ†ãƒ¼ãƒ—æ›¸è¾¼ãƒãƒƒãƒ•ã‚¡ */
+static int tapeWritePos;	/* ãƒ†ãƒ¼ãƒ—æ›¸ãè¾¼ã¿ä½ç½® */
+static int tapeWriteLastStates;	/* æœ€å¾Œã«æ›¸ãè¾¼ã‚“ã æ™‚ç‚¹ã®ç´¯ç©ã‚¹ãƒ†ãƒ¼ãƒˆæ•° */
+static int tapeWriteTotalStates;	/* 1ãƒ“ãƒƒãƒˆã®æ›¸ãè¾¼ã¿ã‚’é–‹å§‹ã—ãŸæ™‚ç‚¹ã‹ã‚‰ã®ç´¯ç©ã‚¹ãƒ†ãƒ¼ãƒˆæ•° */
+static int tapeWriteChangeCount;	/* æ›¸ãè¾¼ã¿ã®ãƒ“ãƒƒãƒˆãŒå¤‰åŒ–ã—ãŸå›æ•° */
 
-static uint8 lastWriteVol = 0;	/* ÅŒã‚Éo—Í‚µ‚½’l */
+static uint8 lastWriteVol = 0;	/* æœ€å¾Œã«å‡ºåŠ›ã—ãŸå€¤ */
 
 /*
-	ƒfƒBƒXƒN‚©‚ç“Ç‚İ‚Ş (startTape‚Ì‰º¿‚¯)
+	ãƒ‡ã‚£ã‚¹ã‚¯ã‹ã‚‰èª­ã¿è¾¼ã‚€ (startTapeã®ä¸‹è«‹ã‘)
 */
 int readBin(const char *path, void *buf, int max_size)
 {
@@ -46,7 +47,7 @@ int readBin(const char *path, void *buf, int max_size)
 }
 
 /*
-	ƒfƒBƒXƒN‚É‘‚«‚Ş(V‹K) (stopTape‚Ì‰º¿‚¯)
+	ãƒ‡ã‚£ã‚¹ã‚¯ã«æ›¸ãè¾¼ã‚€(æ–°è¦) (stopTapeã®ä¸‹è«‹ã‘)
 */
 int writeBin(const char *path, const void *buf, int size)
 {
@@ -64,7 +65,7 @@ int writeBin(const char *path, const void *buf, int size)
 }
 
 /*
-	ƒfƒBƒXƒN‚É‘‚«‚Ş(’Ç‰Á) (stopTape‚Ì‰º¿‚¯)
+	ãƒ‡ã‚£ã‚¹ã‚¯ã«æ›¸ãè¾¼ã‚€(è¿½åŠ ) (stopTapeã®ä¸‹è«‹ã‘)
 */
 int appendBin(const char *path, const void *buf, int size)
 {
@@ -82,7 +83,7 @@ int appendBin(const char *path, const void *buf, int size)
 }
 
 /*
-	ƒe[ƒv‚Ì“Ç‚İæ‚èˆÊ’u‚ğİ’è‚·‚é (‰º¿‚¯)
+	ãƒ†ãƒ¼ãƒ—ã®èª­ã¿å–ã‚Šä½ç½®ã‚’è¨­å®šã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static int setReadPos(struct Bm2stat *bm2, int pos)
 {
@@ -91,7 +92,7 @@ static int setReadPos(struct Bm2stat *bm2, int pos)
 }
 
 /*
-	ƒe[ƒv‚Ì“Ç‚İæ‚èˆÊ’u‚ğ‰Šú‰»‚·‚é (‰º¿‚¯)
+	ãƒ†ãƒ¼ãƒ—ã®èª­ã¿å–ã‚Šä½ç½®ã‚’åˆæœŸåŒ–ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static int resetReadPos(struct Bm2stat *bm2)
 {
@@ -99,7 +100,7 @@ static int resetReadPos(struct Bm2stat *bm2)
 }
 
 /*
-	ƒe[ƒv‚Ì“Ç‚İæ‚èˆÊ’u‚ğ“¾‚é (readSound‚Ì‰º¿‚¯)
+	ãƒ†ãƒ¼ãƒ—ã®èª­ã¿å–ã‚Šä½ç½®ã‚’å¾—ã‚‹ (readSoundã®ä¸‹è«‹ã‘)
 */
 static int getReadPos(const struct Bm2stat *bm2)
 {
@@ -107,21 +108,21 @@ static int getReadPos(const struct Bm2stat *bm2)
 }
 
 /*
-	ƒe[ƒv‚©‚ç“Ç‚İ‚Ş
+	ãƒ†ãƒ¼ãƒ—ã‹ã‚‰èª­ã¿è¾¼ã‚€
 */
 uint8 readSound(struct Bm2stat *bm2)
 {
 	uint8 vol;
 
-	/* ƒe[ƒv‚Ì“Ç‚İæ‚èˆÊ’u‚ğ“¾‚é */
+	/* ãƒ†ãƒ¼ãƒ—ã®èª­ã¿å–ã‚Šä½ç½®ã‚’å¾—ã‚‹ */
 	tapeReadPos = getReadPos(bm2);
 
-	/* ƒe[ƒv‚ÌI’[‚Ü‚Å’B‚µ‚½‚çŠª‚«–ß‚· */
+	/* ãƒ†ãƒ¼ãƒ—ã®çµ‚ç«¯ã¾ã§é”ã—ãŸã‚‰å·»ãæˆ»ã™ */
 	if(tapeReadPos / 11 >= tapeReadBufferSize)
 		tapeReadPos = resetReadPos(bm2);
 
 	switch(tapeReadPos % 11) {
-	case 0: /* ƒXƒ^[ƒgƒrƒbƒg */
+	case 0: /* ã‚¹ã‚¿ãƒ¼ãƒˆãƒ“ãƒƒãƒˆ */
 		vol = 0;
 		break;
 	case 1:
@@ -131,11 +132,11 @@ uint8 readSound(struct Bm2stat *bm2)
 	case 5:
 	case 6:
 	case 7:
-	case 8: /* ƒf[ƒ^ƒrƒbƒg */
+	case 8: /* ãƒ‡ãƒ¼ã‚¿ãƒ“ãƒƒãƒˆ */
 		vol = (tapeReadBuffer[tapeReadPos / 11] & (1 << (tapeReadPos % 11 - 1)) ? 0x80: 0);
 		break;
 	case 9:
-	case 10: /* ƒXƒgƒbƒvƒrƒbƒg */
+	case 10: /* ã‚¹ãƒˆãƒƒãƒ—ãƒ“ãƒƒãƒˆ */
 	default:
 		vol = 0x80;
 		break;
@@ -144,7 +145,7 @@ uint8 readSound(struct Bm2stat *bm2)
 }
 
 /*
-	ƒe[ƒv‚Ì‘‚«‚İˆÊ’u‚ğ‰Šú‰»‚·‚é
+	ãƒ†ãƒ¼ãƒ—ã®æ›¸ãè¾¼ã¿ä½ç½®ã‚’åˆæœŸåŒ–ã™ã‚‹
 */
 static void resetWritePos(struct Bm2stat *bm2)
 {
@@ -153,61 +154,62 @@ static void resetWritePos(struct Bm2stat *bm2)
 }
 
 /*
-	ƒe[ƒv‚Éo—Í‚·‚é (writeSound‚Ì‰º¿‚¯)
+	ãƒ†ãƒ¼ãƒ—ã«å‡ºåŠ›ã™ã‚‹ (writeSoundã®ä¸‹è«‹ã‘)
 */
 static void writeSoundTape(struct Bm2stat *bm2, uint8 vol)
 {
 	int interval, bit;
 
-	/* ÅŒã‚Éo—Í‚µ‚Ä‚©‚ç‚ÌƒXƒe[ƒg”‚ğ‹‚ß‚é */
+	/* æœ€å¾Œã«å‡ºåŠ›ã—ã¦ã‹ã‚‰ã®ã‚¹ãƒ†ãƒ¼ãƒˆæ•°ã‚’æ±‚ã‚ã‚‹ */
 	interval = m68diff(m68states(&bm2->cpu), tapeWriteLastStates);
 	tapeWriteLastStates = m68states(&bm2->cpu);
 
-	/* •Ï‰»‰ñ”‚Æ1ƒrƒbƒg‘‚«‚İŠJn‚©‚ç‚ÌƒXƒe[ƒg”‚ğ‰ÁZ‚·‚é */
-	if(interval > 470) { /* –³‰¹‚©? */
+	/* å¤‰åŒ–å›æ•°ã¨1ãƒ“ãƒƒãƒˆæ›¸ãè¾¼ã¿é–‹å§‹ã‹ã‚‰ã®ã‚¹ãƒ†ãƒ¼ãƒˆæ•°ã‚’åŠ ç®—ã™ã‚‹ */
+	if(interval > 470) { /* ç„¡éŸ³ã‹? */
 		tapeWriteTotalStates = tapeWriteChangeCount = 0;
 		return;
 	}
 	tapeWriteChangeCount++;
 	tapeWriteTotalStates += interval;
 
-	/* 1bit‚É–‚½‚È‚¢‚È‚ç–ß‚é */
+	/* 1bitã«æº€ãŸãªã„ãªã‚‰æˆ»ã‚‹ */
 	if(tapeWriteTotalStates < 2433)
 		return;
 
-	/* ƒrƒbƒg‚ğ“¾‚é */
-	if(tapeWritePos / 11 >= sizeof(tapeWriteBuffer)) /* ƒoƒbƒtƒ@‚ğ’´‚¦‚½‚©? */
+	/* ãƒ“ãƒƒãƒˆã‚’å¾—ã‚‹ */
+	if(tapeWritePos / 11 >= sizeof(tapeWriteBuffer)) /* ãƒãƒƒãƒ•ã‚¡ã‚’è¶…ãˆãŸã‹? */
 		return;
 	bit = (tapeWriteChangeCount > 12);
 	tapeWriteTotalStates = tapeWriteChangeCount = 0;
 
-	/* ƒf[ƒ^‚ğ‘‚«‚Ş */
+	/* ãƒ‡ãƒ¼ã‚¿ã‚’æ›¸ãè¾¼ã‚€ */
 	if(
-	(tapeWritePos % 11 == 0 && bit) ||	/* ƒXƒ^[ƒgƒrƒbƒg‚ª1 (‚¸‚ê‚Ä‚¢‚é) */
-	(tapeWritePos % 11 == 10 && !bit)	/* ƒXƒgƒbƒvƒrƒbƒg‚ª0 (‚¸‚ê‚Ä‚¢‚é) */
+	(tapeWritePos % 11 == 0 && bit) ||	/* ã‚¹ã‚¿ãƒ¼ãƒˆãƒ“ãƒƒãƒˆãŒ1 (ãšã‚Œã¦ã„ã‚‹) */
+	(tapeWritePos % 11 == 10 && !bit)	/* ã‚¹ãƒˆãƒƒãƒ—ãƒ“ãƒƒãƒˆãŒ0 (ãšã‚Œã¦ã„ã‚‹) */
 	)
 		return;
 	if(
-	tapeWritePos % 11 == 0 ||	/* ƒXƒ^[ƒgƒrƒbƒg */
-	tapeWritePos % 11 == 9 ||	/* ƒXƒgƒbƒvƒrƒbƒg */
-	tapeWritePos % 11 == 10	/* ƒXƒgƒbƒvƒrƒbƒg */
+	tapeWritePos % 11 == 0 ||	/* ã‚¹ã‚¿ãƒ¼ãƒˆãƒ“ãƒƒãƒˆ */
+	tapeWritePos % 11 == 9 ||	/* ã‚¹ãƒˆãƒƒãƒ—ãƒ“ãƒƒãƒˆ */
+	tapeWritePos % 11 == 10	/* ã‚¹ãƒˆãƒƒãƒ—ãƒ“ãƒƒãƒˆ */
 	)
 		;
-	else if(bit)	/* ƒf[ƒ^ƒrƒbƒg 1 */
+	else if(bit)	/* ãƒ‡ãƒ¼ã‚¿ãƒ“ãƒƒãƒˆ 1 */
 		tapeWriteBuffer[tapeWritePos / 11] |= (1 << (tapeWritePos % 11 - 1));
-	else	/* ƒf[ƒ^ƒrƒbƒg 0 */
+	else	/* ãƒ‡ãƒ¼ã‚¿ãƒ“ãƒƒãƒˆ 0 */
 		tapeWriteBuffer[tapeWritePos / 11] &= ~(1 << (tapeWritePos % 11 - 1));
 	tapeWritePos++;
 }
 
 /*
-	ƒXƒs[ƒJ‚Éo—Í‚·‚é (writeSound‚Ì‰º¿‚¯)
+	ã‚¹ãƒ”ãƒ¼ã‚«ã«å‡ºåŠ›ã™ã‚‹ (writeSoundã®ä¸‹è«‹ã‘)
 */
+extern int gStates;
 static void writeSoundSpeaker(struct Bm2stat *bm2, uint8 vol)
 {
 	unsigned int pos, off;
 
-	pos = bm2->cpu_freq / bm2->io_freq - bm2->cpu.states;
+	pos = bm2->cpu_freq / bm2->io_freq - gStates;
 	if(pos & 0x80000000)
 		return;
 	else if(pos & 0xf0000000)
@@ -225,7 +227,7 @@ static void writeSoundSpeaker(struct Bm2stat *bm2, uint8 vol)
 }
 
 /*
-	ƒe[ƒv‚Ü‚½‚ÍƒXƒs[ƒJ‚Éo—Í‚·‚é
+	ãƒ†ãƒ¼ãƒ—ã¾ãŸã¯ã‚¹ãƒ”ãƒ¼ã‚«ã«å‡ºåŠ›ã™ã‚‹
 */
 void writeSound(struct Bm2stat *bm2, uint8 vol)
 {
@@ -238,17 +240,17 @@ void writeSound(struct Bm2stat *bm2, uint8 vol)
 }
 
 /*
-	ƒe[ƒv‚Ì“Ç‚İæ‚è/‘‚«‚İ‚ğŠJn‚·‚é
+	ãƒ†ãƒ¼ãƒ—ã®èª­ã¿å–ã‚Š/æ›¸ãè¾¼ã¿ã‚’é–‹å§‹ã™ã‚‹
 */
 void startTape(struct Bm2stat *bm2)
 {
 	bm2->sound_tape = TRUE;
 	bm2->fast = TRUE;
 
-	/* ÅŒã‚É“Ç‚İ‚ñ‚¾ˆÊ’u‚É–ß‚· */
+	/* æœ€å¾Œã«èª­ã¿è¾¼ã‚“ã ä½ç½®ã«æˆ»ã™ */
 	setReadPos(bm2, tapeReadPos);
 
-	/* ƒe[ƒv‚ğ“Ç‚ñ‚Å‚¢‚È‚¢, ‚Ü‚½‚Í“Ç‚İI‚¦‚½ê‡‚Íƒe[ƒv‚ğ“Ç‚İ‚Ş */
+	/* ãƒ†ãƒ¼ãƒ—ã‚’èª­ã‚“ã§ã„ãªã„, ã¾ãŸã¯èª­ã¿çµ‚ãˆãŸå ´åˆã¯ãƒ†ãƒ¼ãƒ—ã‚’èª­ã¿è¾¼ã‚€ */
 	if(tapeReadBufferSize < 0 || tapeReadBufferSize <= getReadPos(bm2) / 11) {
 		tapeReadBufferSize = readBin(bm2->tape_path, tapeReadBuffer, sizeof(tapeReadBuffer));
 		resetReadPos(bm2);
@@ -257,11 +259,11 @@ void startTape(struct Bm2stat *bm2)
 }
 
 /*
-	ƒe[ƒv‚Ì“Ç‚İæ‚è/‘‚«‚İ‚ğI—¹‚·‚é
+	ãƒ†ãƒ¼ãƒ—ã®èª­ã¿å–ã‚Š/æ›¸ãè¾¼ã¿ã‚’çµ‚äº†ã™ã‚‹
 */
 void stopTape(struct Bm2stat *bm2)
 {
-	/* ƒe[ƒv‚Ì“à—e‚ğƒfƒBƒXƒN‚É‘‚«‚Ş */
+	/* ãƒ†ãƒ¼ãƒ—ã®å†…å®¹ã‚’ãƒ‡ã‚£ã‚¹ã‚¯ã«æ›¸ãè¾¼ã‚€ */
 	if(tapeWritePos / 11 > 0) {
 		writeSoundTape(bm2, 0);
 		if(bm2->tape_mode == TAPE_MODE_APPEND)
@@ -279,7 +281,7 @@ void stopTape(struct Bm2stat *bm2)
 }
 
 /*
-	ƒe[ƒv‚ğİ’è‚·‚é
+	ãƒ†ãƒ¼ãƒ—ã‚’è¨­å®šã™ã‚‹
 */
 void setTape(struct Bm2stat *bm2, const char *path)
 {
@@ -289,7 +291,7 @@ void setTape(struct Bm2stat *bm2, const char *path)
 }
 
 /*
-	ƒe[ƒv‚ğŠª‚«–ß‚·
+	ãƒ†ãƒ¼ãƒ—ã‚’å·»ãæˆ»ã™
 */
 void rewindTape(struct Bm2stat *bm2)
 {
@@ -301,7 +303,7 @@ void rewindTape(struct Bm2stat *bm2)
 }
 
 /*
-	ƒe[ƒv‚ğI’[‚Ü‚Å‘‘—‚è‚·‚é
+	ãƒ†ãƒ¼ãƒ—ã‚’çµ‚ç«¯ã¾ã§æ—©é€ã‚Šã™ã‚‹
 */
 void foreTape(struct Bm2stat *bm2)
 {
@@ -311,7 +313,7 @@ void foreTape(struct Bm2stat *bm2)
 }
 
 /*
-	ƒTƒEƒ“ƒhƒoƒbƒtƒ@‚Ì‘å‚«‚³‚ğ‹‚ß‚é
+	ã‚µã‚¦ãƒ³ãƒ‰ãƒãƒƒãƒ•ã‚¡ã®å¤§ãã•ã‚’æ±‚ã‚ã‚‹
 */
 int getSoundSampleSize(int io_freq)
 {
@@ -324,7 +326,7 @@ int getSoundSampleSize(int io_freq)
 }
 
 /*
-	“Ç‚İ‚İƒoƒbƒtƒ@‚Æ‘‚«‚İƒoƒbƒtƒ@‚ğ“ü‚ê‘Ö‚¦‚é
+	èª­ã¿è¾¼ã¿ãƒãƒƒãƒ•ã‚¡ã¨æ›¸ãè¾¼ã¿ãƒãƒƒãƒ•ã‚¡ã‚’å…¥ã‚Œæ›¿ãˆã‚‹
 */
 void flipSoundBuffer(struct Bm2stat *bm2)
 {

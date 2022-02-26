@@ -1,6 +1,6 @@
 /*
-	“ú—§ƒx[ƒVƒbƒNƒ}ƒXƒ^[Jr.ƒGƒ~ƒ…ƒŒ[ƒ^
-	ŠÂ‹«ˆË‘¶
+	æ—¥ç«‹ãƒ™ãƒ¼ã‚·ãƒƒã‚¯ãƒžã‚¹ã‚¿ãƒ¼Jr.ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿
+	ç’°å¢ƒä¾å­˜
 */
 
 #include <stdio.h>
@@ -13,41 +13,41 @@
 #include "windows.h"
 #endif
 
-#define CHR_WIDTH	8	/* •¶Žš‚Ì• */
-#define CHR_HEIGHT	8	/* •¶Žš‚Ì‚‚³ */
-#define COLS	32	/* ‰¡‚Ì•¶Žš” */
-#define ROWS	24	/* c‚Ì•¶Žš” */
-#define BORDER_WIDTH	32	/* ˜g‚Ì• */
-#define BORDER_HEIGHT	24	/* ˜g‚Ì‚‚³ */
+#define CHR_WIDTH	8	/* æ–‡å­—ã®å¹… */
+#define CHR_HEIGHT	8	/* æ–‡å­—ã®é«˜ã• */
+#define COLS	32	/* æ¨ªã®æ–‡å­—æ•° */
+#define ROWS	24	/* ç¸¦ã®æ–‡å­—æ•° */
+#define BORDER_WIDTH	32	/* æž ã®å¹… */
+#define BORDER_HEIGHT	24	/* æž ã®é«˜ã• */
 
 #if SDL_MAJOR_VERSION == 2
-static SDL_Window *window = NULL;	/* ƒEƒBƒ“ƒhƒE */
+static SDL_Window *window = NULL;	/* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ */
 #elif SDL_MAJOR_VERSION == 1
-const static SDL_VideoInfo *video = NULL;	/* ƒrƒfƒIî•ñ */
+const static SDL_VideoInfo *video = NULL;	/* ãƒ“ãƒ‡ã‚ªæƒ…å ± */
 #endif
-static SDL_Surface *screen;		/* ƒfƒBƒXƒvƒŒƒC‚ÌƒT[ƒtƒFƒCƒX */
-static int zoom;			/* ‰æ–Ê‚Ì”{—¦ */
-static int fullLine;			/* ‘Sƒ‰ƒCƒ“•\Ž¦‚©? */
+static SDL_Surface *screen;		/* ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ */
+static int zoom;			/* ç”»é¢ã®å€çŽ‡ */
+static int fullLine;			/* å…¨ãƒ©ã‚¤ãƒ³è¡¨ç¤ºã‹? */
 static Uint8 pixMap[8][16];		/* pixmap */
 
-static uint8 vram[ROWS * COLS * CHR_WIDTH];	/* ‰¼‘zVRAM */
-static uint8 oldVram[ROWS * COLS * CHR_WIDTH];	/* ‘O‚ÌƒtƒŒ[ƒ€‚Ì‰¼‘zVRAM */
-static uint8 colorMap[ROWS * COLS];		/* ƒJƒ‰[ƒ}ƒbƒv */
-static uint8 oldColorMap[ROWS * COLS];		/* ‘O‚ÌƒtƒŒ[ƒ€‚ÌƒJƒ‰[ƒ}ƒbƒv */
-static uint8 colorMapMono[ROWS * COLS];		/* ƒJƒ‰[ƒAƒ_ƒvƒ^‚ª‚È‚¢ê‡‚ÌƒJƒ‰[ƒ}ƒbƒv */
+static uint8 vram[ROWS * COLS * CHR_WIDTH];	/* ä»®æƒ³VRAM */
+static uint8 oldVram[ROWS * COLS * CHR_WIDTH];	/* å‰ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã®ä»®æƒ³VRAM */
+static uint8 colorMap[ROWS * COLS];		/* ã‚«ãƒ©ãƒ¼ãƒžãƒƒãƒ— */
+static uint8 oldColorMap[ROWS * COLS];		/* å‰ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã®ã‚«ãƒ©ãƒ¼ãƒžãƒƒãƒ— */
+static uint8 colorMapMono[ROWS * COLS];		/* ã‚«ãƒ©ãƒ¼ã‚¢ãƒ€ãƒ—ã‚¿ãŒãªã„å ´åˆã®ã‚«ãƒ©ãƒ¼ãƒžãƒƒãƒ— */
 static uint8 oldBckReg;
 static uint8 oldReverse;
 
-static SDL_AudioSpec audio;		/* ‰¹ºî•ñ */
-static uint8 *soundBuffer;		/* ‰¹ºƒoƒbƒtƒ@ */
-static int soundBufferSize;		/* ‰¹ºƒoƒbƒtƒ@‚ÌƒTƒCƒY */
-static uint8 **soundReadPointer;	/* ‰¹º“Çžƒ|ƒCƒ“ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^ */
-static uint8 **soundWritePointer;	/* ‰¹º‘žƒ|ƒCƒ“ƒ^‚Ö‚Ìƒ|ƒCƒ“ƒ^ */
+static SDL_AudioSpec audio;		/* éŸ³å£°æƒ…å ± */
+static uint8 *soundBuffer;		/* éŸ³å£°ãƒãƒƒãƒ•ã‚¡ */
+static int soundBufferSize;		/* éŸ³å£°ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º */
+static uint8 **soundReadPointer;	/* éŸ³å£°èª­è¾¼ãƒã‚¤ãƒ³ã‚¿ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
+static uint8 **soundWritePointer;	/* éŸ³å£°æ›¸è¾¼ãƒã‚¤ãƒ³ã‚¿ã¸ã®ãƒã‚¤ãƒ³ã‚¿ */
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 #if SDL_MAJOR_VERSION == 2
 /*
-	UTF-8‚ðShift-JIS‚É•ÏŠ·‚·‚é (‰º¿‚¯)
+	UTF-8ã‚’Shift-JISã«å¤‰æ›ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static char *convertUtf8ToSjis(char *outstr, int outsize, const char *instr)
 {
@@ -59,7 +59,7 @@ static char *convertUtf8ToSjis(char *outstr, int outsize, const char *instr)
 }
 
 /*
-	Shift-JIS‚ðUTF-8‚É•ÏŠ·‚·‚é
+	Shift-JISã‚’UTF-8ã«å¤‰æ›ã™ã‚‹
 */
 static char *convertSjisToUtf8(char *outstr, int outsize, char *instr)
 {
@@ -81,7 +81,7 @@ static char *convertSjisToUtf8(char *outstr, int outsize, char *instr)
 #endif
 
 /*
-	…•½‚Èü‚ð•`‚­ (‰º¿‚¯)
+	æ°´å¹³ãªç·šã‚’æã (ä¸‹è«‹ã‘)
 */
 static inline void putline(int y, int x, int width, uint8 color, int full_line)
 {
@@ -97,7 +97,7 @@ static inline void putline(int y, int x, int width, uint8 color, int full_line)
 }
 
 /*
-	ƒpƒ^[ƒ“‚ð1s•`‚­ (putpat‚Ì‰º¿‚¯)
+	ãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’1è¡Œæã (putpatã®ä¸‹è«‹ã‘)
 */
 static inline void putpat1(int col, int y, uint8 color, uint8 pat)
 {
@@ -127,13 +127,13 @@ static inline void putpat1(int col, int y, uint8 color, uint8 pat)
 }
 
 /*
-	ƒpƒ^[ƒ“‚ð•`‚­ (‰º¿‚¯)
+	ãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’æã (ä¸‹è«‹ã‘)
 */
 static inline void putpat(int col, int row, uint8 color, int blink, uint8 pat0, uint8 pat1, uint8 pat2, uint8 pat3, uint8 pat4, uint8 pat5, uint8 pat6, uint8 pat7)
 {
 	uint8 *v0, *v1, *v2, *v3, *v4, *v5, *v6, *v7, *c = &colorMap[row * COLS + col];
 
-	/* F‚ð“¾‚é */
+	/* è‰²ã‚’å¾—ã‚‹ */
 	if(blink) {
 		if(color & 0x08)
 			color &= 0x70;
@@ -146,7 +146,7 @@ static inline void putpat(int col, int row, uint8 color, int blink, uint8 pat0, 
 			color &= 0x77;
 	}
 
-	/* ‰¼‘zVRAM‚ÌƒAƒhƒŒƒX‚ð“¾‚é */
+	/* ä»®æƒ³VRAMã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å¾—ã‚‹ */
 	v0 = &vram[row * COLS * CHR_WIDTH + col];
 	v1 = v0 + COLS;
 	v2 = v1 + COLS;
@@ -156,7 +156,7 @@ static inline void putpat(int col, int row, uint8 color, int blink, uint8 pat0, 
 	v6 = v5 + COLS;
 	v7 = v6 + COLS;
 
-	/* ‰¼‘zVRAM‚ðXV‚µ•\Ž¦‚·‚é */
+	/* ä»®æƒ³VRAMã‚’æ›´æ–°ã—è¡¨ç¤ºã™ã‚‹ */
 	if(*c != color) {
 		*c = color;
 		*v0 = pat0;
@@ -212,7 +212,7 @@ static inline void putpat(int col, int row, uint8 color, int blink, uint8 pat0, 
 }
 
 /*
-	ƒfƒBƒXƒvƒŒƒC‚ðXV‚·‚é(ƒeƒLƒXƒgƒ‚[ƒh) (updateScreen‚Ì‰º¿‚¯)
+	ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã‚’æ›´æ–°ã™ã‚‹(ãƒ†ã‚­ã‚¹ãƒˆãƒ¢ãƒ¼ãƒ‰) (updateScreenã®ä¸‹è«‹ã‘)
 */
 static inline void updateScreenText(const struct Bm2stat *bm2, uint16 p, int blink)
 {
@@ -241,7 +241,7 @@ static inline void updateScreenText(const struct Bm2stat *bm2, uint16 p, int bli
 }
 
 /*
-	ƒfƒBƒXƒvƒŒƒC‚ðXV‚·‚é(ƒOƒ‰ƒtƒBƒbƒNƒ‚[ƒh) (updateScreen‚Ì‰º¿‚¯)
+	ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã‚’æ›´æ–°ã™ã‚‹(ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒ¢ãƒ¼ãƒ‰) (updateScreenã®ä¸‹è«‹ã‘)
 */
 static inline void updateScreenGraphic(const struct Bm2stat *bm2, uint16 p, int blink)
 {
@@ -272,7 +272,7 @@ static inline void updateScreenGraphic(const struct Bm2stat *bm2, uint16 p, int 
 }
 
 /*
-	ƒfƒBƒXƒvƒŒƒC‚Ì”wŒi‚ðXV‚·‚é (updateScreen‚Ì‰º¿‚¯)
+	ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã®èƒŒæ™¯ã‚’æ›´æ–°ã™ã‚‹ (updateScreenã®ä¸‹è«‹ã‘)
 */
 static inline void updateScreenBack(const struct Bm2stat *bm2)
 {
@@ -293,7 +293,7 @@ static inline void updateScreenBack(const struct Bm2stat *bm2)
 }
 
 /*
-	ƒfƒBƒXƒvƒŒƒC‚ðXV‚·‚é
+	ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ã‚’æ›´æ–°ã™ã‚‹
 */
 void updateScreen(const struct Bm2stat *bm2)
 {
@@ -306,36 +306,36 @@ void updateScreen(const struct Bm2stat *bm2)
 		blink ^= 1;
 	}
 
-	/* ”wŒi‚ðƒT[ƒtƒFƒCƒX‚É‘‚«ž‚Þ */
+	/* èƒŒæ™¯ã‚’ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã«æ›¸ãè¾¼ã‚€ */
 	if(bm2->bckreg != oldBckReg || bm2->reverse != oldReverse)
 		updateScreenBack(bm2);
 
-	/* ƒT[ƒtƒFƒCƒX‚É‘‚«ž‚Þ */
+	/* ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã«æ›¸ãè¾¼ã‚€ */
 	switch(bm2->screen_mode) {
-	case 0x00:	/* ƒeƒLƒXƒg */
+	case 0x00:	/* ãƒ†ã‚­ã‚¹ãƒˆ */
 		updateScreenText(bm2, 0x100, blink);
 		break;
-	case 0x40:	/* ƒeƒLƒXƒgEƒOƒ‰ƒtƒBƒbƒNƒy[ƒW1¬‡ */
+	case 0x40:	/* ãƒ†ã‚­ã‚¹ãƒˆãƒ»ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒšãƒ¼ã‚¸1æ··åˆ */
 		if(count & 1)
 			updateScreenText(bm2, 0x100, blink);
 		else
 			updateScreenGraphic(bm2, 0x900, blink);
 		break;
-	case 0x4c:	/* ƒeƒLƒXƒgEƒOƒ‰ƒtƒBƒbƒNƒy[ƒW2¬‡ */
+	case 0x4c:	/* ãƒ†ã‚­ã‚¹ãƒˆãƒ»ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒšãƒ¼ã‚¸2æ··åˆ */
 		if(count & 1)
 			updateScreenText(bm2, 0x100, blink);
 		else
 			updateScreenGraphic(bm2, 0x2100, blink);
 		break;
-	case 0xc0:	/* ƒOƒ‰ƒtƒBƒbƒNƒy[ƒW1 */
+	case 0xc0:	/* ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒšãƒ¼ã‚¸1 */
 		updateScreenGraphic(bm2, 0x900, blink);
 		break;
-	case 0xcc:	/* ƒOƒ‰ƒtƒBƒbƒNƒy[ƒW2 */
+	case 0xcc:	/* ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒšãƒ¼ã‚¸2 */
 		updateScreenGraphic(bm2, 0x2100, blink);
 		break;
 	}
 
-	/* ‘O‚ÌƒtƒŒ[ƒ€‚Æ•Ï‚í‚Á‚½•”•ª‚ðXV‚·‚é */
+	/* å‰ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã¨å¤‰ã‚ã£ãŸéƒ¨åˆ†ã‚’æ›´æ–°ã™ã‚‹ */
 	r = rect;
 	if(bm2->bckreg != oldBckReg || bm2->reverse != oldReverse) {
 		oldBckReg = bm2->bckreg;
@@ -378,7 +378,7 @@ void updateScreen(const struct Bm2stat *bm2)
 }
 
 /*
-	MB-6885‰¼‘zƒL[ƒR[ƒh‚©‚çSDLƒL[‚ð“¾‚é (getAutoKeyEvent‚Ì‰º¿‚¯)
+	MB-6885ä»®æƒ³ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã‹ã‚‰SDLã‚­ãƒ¼ã‚’å¾—ã‚‹ (getAutoKeyEventã®ä¸‹è«‹ã‘)
 */
 static int getSdlkey(const struct Bm2stat *bm2, int bmkey)
 {
@@ -391,18 +391,18 @@ static int getSdlkey(const struct Bm2stat *bm2, int bmkey)
 }
 
 /*
-	Ž©“®“ü—ÍƒL[‚ð“¾‚é (updateKey‚Ì‰º¿‚¯)
+	è‡ªå‹•å…¥åŠ›ã‚­ãƒ¼ã‚’å¾—ã‚‹ (updateKeyã®ä¸‹è«‹ã‘)
 */
 static int getAutoKeyEvent(struct Bm2stat *bm2, SDL_Event *e)
 {
 	int press, bmkey;
 	char ch;
 
-	/* ƒL[‚ð“¾‚é */
+	/* ã‚­ãƒ¼ã‚’å¾—ã‚‹ */
 	if(!getAutoKey(bm2, &press, &ch, &bmkey))
 		return FALSE;
 
-	/* SDL‚ÌƒCƒxƒ“ƒg‚É‚·‚é */
+	/* SDLã®ã‚¤ãƒ™ãƒ³ãƒˆã«ã™ã‚‹ */
 	memset(e, 0, sizeof(*e));
 	e->type = (press ? SDL_KEYDOWN: SDL_KEYUP);
 #if SDL_MAJOR_VERSION == 2
@@ -416,7 +416,7 @@ static int getAutoKeyEvent(struct Bm2stat *bm2, SDL_Event *e)
 }
 
 /*
-	ƒL[‚Ìƒrƒbƒg‚ð“¾‚é (updateKey‚Ì‰º¿‚¯)
+	ã‚­ãƒ¼ã®ãƒ“ãƒƒãƒˆã‚’å¾—ã‚‹ (updateKeyã®ä¸‹è«‹ã‘)
 */
 static int getKeyF(int bmkey)
 {
@@ -426,7 +426,7 @@ static int getKeyF(int bmkey)
 }
 
 /*
-	ƒL[ƒXƒgƒ[ƒu‚ð“¾‚é (updateKey‚Ì‰º¿‚¯)
+	ã‚­ãƒ¼ã‚¹ãƒˆãƒ­ãƒ¼ãƒ–ã‚’å¾—ã‚‹ (updateKeyã®ä¸‹è«‹ã‘)
 */
 static int getKeyE(int bmkey)
 {
@@ -436,7 +436,7 @@ static int getKeyE(int bmkey)
 }
 
 /*
-	ƒL[‚ðXV‚·‚é
+	ã‚­ãƒ¼ã‚’æ›´æ–°ã™ã‚‹
 */
 int updateKey(struct Bm2stat *bm2)
 {
@@ -551,6 +551,8 @@ int updateKey(struct Bm2stat *bm2)
 		case SDL_WINDOWEVENT:
 			if(e.window.event == SDL_WINDOWEVENT_EXPOSED)
 				SDL_UpdateWindowSurface(window);
+			else if (e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+				loadBinary(bm2);
 			break;
 #endif
 		case SDL_QUIT:
@@ -562,8 +564,9 @@ int updateKey(struct Bm2stat *bm2)
 }
 
 /*
-	‘Ò‚Â
+	å¾…ã¤
 */
+
 void delay(int interval)
 {
 	static Uint32 last = 0, left;
@@ -579,7 +582,7 @@ void delay(int interval)
 }
 
 /*
-	Œ©o‚µ‚ðXV‚·‚é
+	è¦‹å‡ºã—ã‚’æ›´æ–°ã™ã‚‹
 */
 void updateCaption(const struct Bm2stat *bm2)
 {
@@ -615,7 +618,7 @@ void updateCaption(const struct Bm2stat *bm2)
 }
 
 /*
-	‰¹‚ðo—Í‚·‚é (‰º¿‚¯)
+	éŸ³ã‚’å‡ºåŠ›ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static void SDLCALL playSound(void *unused, Uint8 *stream, int len)
 {
@@ -633,10 +636,12 @@ static void SDLCALL playSound(void *unused, Uint8 *stream, int len)
 		return;
 
 	*soundReadPointer = next_read_pointer;
+
+	signal_snd();
 }
 
 /*
-	ƒGƒ‰[‚ð•\Ž¦‚·‚é
+	ã‚¨ãƒ©ãƒ¼ã‚’è¡¨ç¤ºã™ã‚‹
 */
 void popup(const char *str, ...)
 {
@@ -656,7 +661,7 @@ void popup(const char *str, ...)
 }
 
 /*
-	I—¹‚·‚é (‰º¿‚¯)
+	çµ‚äº†ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static SDLCALL void quitDepend(void)
 {
@@ -664,7 +669,7 @@ static SDLCALL void quitDepend(void)
 }
 
 /*
-	‰æ‘œ‚Ì“_‚Ì–¾‚é‚³‚ð“¾‚é (‰º¿‚¯)
+	ç”»åƒã®ç‚¹ã®æ˜Žã‚‹ã•ã‚’å¾—ã‚‹ (ä¸‹è«‹ã‘)
 */
 static int point(SDL_Surface *surface, int x, int y)
 {
@@ -706,7 +711,7 @@ static int point(SDL_Surface *surface, int x, int y)
 }
 
 /*
-	ƒtƒHƒ“ƒg‚ð“Ç‚Ýž‚Þ
+	ãƒ•ã‚©ãƒ³ãƒˆã‚’èª­ã¿è¾¼ã‚€
 */
 int loadFontBmp(struct Bm2stat *bm2, const char *font_path)
 {
@@ -737,7 +742,7 @@ int loadFontBmp(struct Bm2stat *bm2, const char *font_path)
 }
 
 /*
-	ŠÂ‹«ˆË‘¶•”•ª‚ð‰Šú‰»‚·‚é
+	ç’°å¢ƒä¾å­˜éƒ¨åˆ†ã‚’åˆæœŸåŒ–ã™ã‚‹
 */
 int initDepend(const struct Bm2stat *bm2, int argc, char *argv[])
 {
@@ -747,7 +752,7 @@ int initDepend(const struct Bm2stat *bm2, int argc, char *argv[])
 	Uint32 _pix[8];
 	Uint8 pix[4], *p, mask[32 * 32 / 8];
 
-	/* ‰Šú‰»Ï‚Ý‚©? */
+	/* åˆæœŸåŒ–æ¸ˆã¿ã‹? */
 #if SDL_MAJOR_VERSION == 2
 	if(window != NULL)
 		return TRUE;
@@ -755,17 +760,17 @@ int initDepend(const struct Bm2stat *bm2, int argc, char *argv[])
 	if(video != NULL)
 		return TRUE;
 #endif
-	/* Ý’èƒtƒ@ƒCƒ‹‚ð“Ç‚Ýž‚Þ */
+	/* è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€ */
 	getConfig(conf, sizeof(conf) / sizeof(conf[0]), "bm2config", argc, argv);
 
-	/* SDL‚ð‰Šú‰»‚·‚é */
+	/* SDLã‚’åˆæœŸåŒ–ã™ã‚‹ */
 	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | (bm2->use_sound ? SDL_INIT_AUDIO: 0))) {
 		fprintf(stderr, "SDL_Init fail. %s\n", SDL_GetError());
 		return FALSE;
 	}
 	atexit(quitDepend);
 
-	/* ƒEƒBƒ“ƒhƒE‚ð¶¬‚·‚é */
+	/* ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç”Ÿæˆã™ã‚‹ */
 #if SDL_MAJOR_VERSION == 2
 	if((window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0, SDL_WINDOW_HIDDEN)) == NULL) {
 		popup("SDL_CreateWindow fail. %s\n", SDL_GetError());
@@ -801,9 +806,10 @@ int initDepend(const struct Bm2stat *bm2, int argc, char *argv[])
 		return FALSE;
 	}
 #endif
+	SDL_FillRect(screen, NULL, 0);
 	updateCaption(bm2);
 
-	/* pixmap‚ð“¾‚é */
+	/* pixmapã‚’å¾—ã‚‹ */
 	if(bm2->display == 0x000000) {
 		_pix[0] = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 		_pix[1] = SDL_MapRGB(screen->format, 0x00, 0x00, 0xff);
@@ -857,10 +863,10 @@ int initDepend(const struct Bm2stat *bm2, int argc, char *argv[])
 			memcpy(p, pix, screen->format->BytesPerPixel);
 	}
 
-	/* ƒ‚ƒmƒNƒŽž‚ÌƒJƒ‰[ƒ}ƒbƒv‚ð‰Šú‰»‚·‚é */
+	/* ãƒ¢ãƒŽã‚¯ãƒ­æ™‚ã®ã‚«ãƒ©ãƒ¼ãƒžãƒƒãƒ—ã‚’åˆæœŸåŒ–ã™ã‚‹ */
 	memset(colorMapMono, 0x07, sizeof(colorMapMono));
 
-	/* ‰¹º‚ð‰Šú‰»‚·‚é */
+	/* éŸ³å£°ã‚’åˆæœŸåŒ–ã™ã‚‹ */
 	if(bm2->use_sound) {
 		audio.freq = 44100;
 		audio.format = AUDIO_S8;

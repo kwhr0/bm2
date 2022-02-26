@@ -1,5 +1,5 @@
 /*
-	Motorola SƒŒƒR[ƒhˆ— (srecord.c)
+	Motorola Sãƒ¬ã‚³ãƒ¼ãƒ‰å‡¦ç† (srecord.c)
 */
 
 #include <stdio.h>
@@ -9,7 +9,7 @@
 #define MAX_SIZE	0x7fffffff
 
 /*
-	•¶š‚ğ”’l(1byte)‚É•ÏŠ·‚·‚é (‰º¿‚¯)
+	æ–‡å­—ã‚’æ•°å€¤(1byte)ã«å¤‰æ›ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static int h2i(char c)
 {
@@ -66,7 +66,7 @@ static int hex2i(const char *hex)
 }
 
 /*
-	SƒŒƒR[ƒhŒ`®‚ÌƒeƒLƒXƒg‚ğƒoƒCƒiƒŠ‚É•ÏŠ·‚·‚é (‰º¿‚¯)
+	Sãƒ¬ã‚³ãƒ¼ãƒ‰å½¢å¼ã®ãƒ†ã‚­ã‚¹ãƒˆã‚’ãƒã‚¤ãƒŠãƒªã«å¤‰æ›ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static off_t s2bin(void *mem, off_t *off, const char *txt, size_t mem_size, int check)
 {
@@ -76,43 +76,43 @@ static off_t s2bin(void *mem, off_t *off, const char *txt, size_t mem_size, int 
 
 	*off = 0;
 
-	/* ƒXƒ^[ƒgƒ}[ƒN */
+	/* ã‚¹ã‚¿ãƒ¼ãƒˆãƒãƒ¼ã‚¯ */
 	if(*r++ != 'S')
 		return -1;
 
-	/* ƒŒƒR[ƒhƒ^ƒCƒv */
+	/* ãƒ¬ã‚³ãƒ¼ãƒ‰ã‚¿ã‚¤ãƒ— */
 	switch(*r++) {
-	case '0':	/* ƒXƒ^[ƒgƒŒƒR[ƒh */
+	case '0':	/* ã‚¹ã‚¿ãƒ¼ãƒˆãƒ¬ã‚³ãƒ¼ãƒ‰ */
 		return 0;
-	case '1':	/* ƒf[ƒ^ƒŒƒR[ƒh(16bit) */
+	case '1':	/* ãƒ‡ãƒ¼ã‚¿ãƒ¬ã‚³ãƒ¼ãƒ‰(16bit) */
 		address_size = 2;
 		break;
-	case '2':	/* ƒf[ƒ^ƒŒƒR[ƒh(24bit) */
+	case '2':	/* ãƒ‡ãƒ¼ã‚¿ãƒ¬ã‚³ãƒ¼ãƒ‰(24bit) */
 		address_size = 3;
 		break;
-	case '3':	/* ƒf[ƒ^ƒŒƒR[ƒh(32bit) */
+	case '3':	/* ãƒ‡ãƒ¼ã‚¿ãƒ¬ã‚³ãƒ¼ãƒ‰(32bit) */
 		address_size = 4;
 		break;
-	case '4':	/* ƒVƒ“ƒ{ƒ‹ƒŒƒR[ƒh */
-	case '5':	/* ƒf[ƒ^ƒŒƒR[ƒh”(2byte) */
-	case '6':	/* ƒf[ƒ^ƒŒƒR[ƒh”(3byte) */
+	case '4':	/* ã‚·ãƒ³ãƒœãƒ«ãƒ¬ã‚³ãƒ¼ãƒ‰ */
+	case '5':	/* ãƒ‡ãƒ¼ã‚¿ãƒ¬ã‚³ãƒ¼ãƒ‰æ•°(2byte) */
+	case '6':	/* ãƒ‡ãƒ¼ã‚¿ãƒ¬ã‚³ãƒ¼ãƒ‰æ•°(3byte) */
 		return 0;
-	case '7':	/* I—¹(32bit) */
-	case '8':	/* I—¹(24bit) */
-	case '9':	/* I—¹(16bit) */
+	case '7':	/* çµ‚äº†(32bit) */
+	case '8':	/* çµ‚äº†(24bit) */
+	case '9':	/* çµ‚äº†(16bit) */
 		return 0;
-	default:	/* ˆÙí */
+	default:	/* ç•°å¸¸ */
 		return -1;
 	}
 
-	/* ƒŒƒR[ƒhŒ…” */
+	/* ãƒ¬ã‚³ãƒ¼ãƒ‰æ¡æ•° */
 	if((val = hex2i(r)) < 0)
 		return -1;
 	len = val - address_size - 1;
 	sum = val;
 	r += 2;
 
-	/* ƒAƒhƒŒƒX */
+	/* ã‚¢ãƒ‰ãƒ¬ã‚¹ */
 	*off = 0;
 	for(; address_size > 0; address_size--, r += 2) {
 		if((val = hex2i(r)) < 0)
@@ -121,7 +121,7 @@ static off_t s2bin(void *mem, off_t *off, const char *txt, size_t mem_size, int 
 		sum += val;
 	}
 
-	/* ƒf[ƒ^•” */
+	/* ãƒ‡ãƒ¼ã‚¿éƒ¨ */
 	for(
 	i = 0, w = (unsigned char *)mem + *off;
 	i < len && w < (unsigned char *)mem + mem_size;
@@ -134,7 +134,7 @@ static off_t s2bin(void *mem, off_t *off, const char *txt, size_t mem_size, int 
 		sum += val;
 	}
 
-	/* ƒ`ƒFƒbƒNƒTƒ€ */
+	/* ãƒã‚§ãƒƒã‚¯ã‚µãƒ  */
 	if((val = hex2i(r)) < 0)
 		return -1;
 	sum += val;
@@ -145,7 +145,7 @@ static off_t s2bin(void *mem, off_t *off, const char *txt, size_t mem_size, int 
 }
 
 /*
-	”’l(1byte)‚ğ•¶š‚É•ÏŠ·‚·‚é (‰º¿‚¯)
+	æ•°å€¤(1byte)ã‚’æ–‡å­—ã«å¤‰æ›ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static char *int2c(char *hex, int i)
 {
@@ -160,7 +160,7 @@ static char *int2c(char *hex, int i)
 }
 
 /*
-	ƒoƒCƒiƒŠ‚ğSƒŒƒR[ƒhŒ`®‚ÌƒeƒLƒXƒg‚É•ÏŠ·‚·‚é (‰º¿‚¯)
+	ãƒã‚¤ãƒŠãƒªã‚’Sãƒ¬ã‚³ãƒ¼ãƒ‰å½¢å¼ã®ãƒ†ã‚­ã‚¹ãƒˆã«å¤‰æ›ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static char *bin2s(char *txt, const unsigned char *mem, off_t off, off_t len, char record_type)
 {
@@ -168,10 +168,10 @@ static char *bin2s(char *txt, const unsigned char *mem, off_t off, off_t len, ch
 	const unsigned char *r;
 	char *w = txt;
 
-	/* ƒXƒ^[ƒgƒ}[ƒN */
+	/* ã‚¹ã‚¿ãƒ¼ãƒˆãƒãƒ¼ã‚¯ */
 	*w++ = 'S';
 
-	/* ƒŒƒR[ƒhƒ^ƒCƒv */
+	/* ãƒ¬ã‚³ãƒ¼ãƒ‰ã‚¿ã‚¤ãƒ— */
 	if(len > 0)
 		*w = record_type;
 	else if(record_type == '3')
@@ -182,12 +182,12 @@ static char *bin2s(char *txt, const unsigned char *mem, off_t off, off_t len, ch
 		*w = '9';
 	w++;
 
-	/* ƒŒƒR[ƒh’· */
+	/* ãƒ¬ã‚³ãƒ¼ãƒ‰é•· */
 	int2c(w, len + 3);
 	sum = len + 3;
 	w += 2;
 
-	/* ƒAƒhƒŒƒX */
+	/* ã‚¢ãƒ‰ãƒ¬ã‚¹ */
 	if(record_type == '3') {
 		int2c(w, (off & 0xff000000) >> 24);
 		w += 2;
@@ -205,18 +205,18 @@ static char *bin2s(char *txt, const unsigned char *mem, off_t off, off_t len, ch
 	w += 2;
 	sum += (off & 0x000000ff);
 
-	/* ƒf[ƒ^•” */
+	/* ãƒ‡ãƒ¼ã‚¿éƒ¨ */
 	if(mem != NULL)
 		for(r = mem + off; r < mem + off + len; r++, w += 2) {
 			int2c(w, *r);
 			sum += *r;
 		}
 
-	/* ƒ`ƒFƒbƒNƒTƒ€ */
+	/* ãƒã‚§ãƒƒã‚¯ã‚µãƒ  */
 	int2c(w, ~sum & 0xff);
 	w += 2;
 
-	/* ‰üs */
+	/* æ”¹è¡Œ */
 	*w++ = '\n';
 	*w = 0;
 
@@ -224,7 +224,7 @@ static char *bin2s(char *txt, const unsigned char *mem, off_t off, off_t len, ch
 }
 
 /*
-	SƒŒƒR[ƒhŒ`®‚Ìƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
+	Sãƒ¬ã‚³ãƒ¼ãƒ‰å½¢å¼ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€
 */
 size_t readSRecord(const char *path, void *mem, off_t *ret_begin, size_t mem_size, int check)
 {
@@ -253,7 +253,7 @@ size_t readSRecord(const char *path, void *mem, off_t *ret_begin, size_t mem_siz
 }
 
 /*
-	SƒŒƒR[ƒhŒ`®‚Ìƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş(ƒtƒ@ƒCƒ‹“à‚ÌƒAƒhƒŒƒX‚ğ–³‹‚·‚é)
+	Sãƒ¬ã‚³ãƒ¼ãƒ‰å½¢å¼ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€(ãƒ•ã‚¡ã‚¤ãƒ«å†…ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’ç„¡è¦–ã™ã‚‹)
 */
 size_t readSRecordAbs(const char *path, void *mem, off_t *ret_begin, size_t mem_size, int check)
 {
@@ -268,7 +268,7 @@ size_t readSRecordAbs(const char *path, void *mem, off_t *ret_begin, size_t mem_
 }
 
 /*
-	SƒŒƒR[ƒhŒ`®‚Ìƒtƒ@ƒCƒ‹‚ğ‘‚«‚Ş (ŠJ‚¢‚½ƒtƒ@ƒCƒ‹‚É‘Î‚µ‚Ä)
+	Sãƒ¬ã‚³ãƒ¼ãƒ‰å½¢å¼ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ›¸ãè¾¼ã‚€ (é–‹ã„ãŸãƒ•ã‚¡ã‚¤ãƒ«ã«å¯¾ã—ã¦)
 */
 int putSRecord(FILE *fp, const void *mem, off_t begin, size_t size, char record_type)
 {
@@ -295,7 +295,7 @@ int putSRecord(FILE *fp, const void *mem, off_t begin, size_t size, char record_
 }
 
 /*
-	SƒŒƒR[ƒhŒ`®‚Ìƒtƒ@ƒCƒ‹‚ğ‘‚«‚Ş
+	Sãƒ¬ã‚³ãƒ¼ãƒ‰å½¢å¼ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ›¸ãè¾¼ã‚€
 */
 size_t writeSRecord(const char *path, const void *mem, off_t begin, size_t size)
 {
@@ -325,7 +325,7 @@ size_t writeSRecord(const char *path, const void *mem, off_t begin, size_t size)
 }
 
 /*
-	SƒŒƒR[ƒhŒ`®‚Ìƒtƒ@ƒCƒ‹‚ğ‘‚«‚Ş(ƒƒ‚ƒŠ‚Ìæ“ª‚©‚ç‘‚«‚Ş)
+	Sãƒ¬ã‚³ãƒ¼ãƒ‰å½¢å¼ã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æ›¸ãè¾¼ã‚€(ãƒ¡ãƒ¢ãƒªã®å…ˆé ­ã‹ã‚‰æ›¸ãè¾¼ã‚€)
 */
 size_t writeSRecordAbs(const char *path, const void *mem, off_t begin, size_t size)
 {

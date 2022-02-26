@@ -1,9 +1,10 @@
 EXE = bm2
 CC = gcc
-OBJS = main.o m6800.o m6800asm.o bm2mem.o bm2sub.o sound.o util.o menu.o init.o depend.o sdlxpm.o srecord.o conf.o
+OBJS = HD6303.o main.o m68alt.o bm2mem.o bm2sub.o sound.o util.o menu.o init.o depend.o sdlxpm.o srecord.o conf.o
 
 # SDL2.0
-CFLAGS = -O3 -finline-limit-20000 -DM68_TRACE -DM68_SUB -Wall $(shell sdl2-config --cflags)
+CFLAGS = -O3 -Wall $(shell sdl2-config --cflags)
+CXXFLAGS = $(CFLAGS) --std=c++11
 LDFLAGS = -s $(shell sdl2-config --libs)
 
 # SDL1.2
@@ -11,20 +12,17 @@ LDFLAGS = -s $(shell sdl2-config --libs)
 #LDFLAGS = -s $(shell sdl-config --libs)
 
 $(EXE): $(OBJS)
-	$(CC) -o $(EXE) $(OBJS) $(LDFLAGS)
+	$(CXX) -o $(EXE) $(OBJS) $(LDFLAGS)
 win32: $(OBJS) resource.o
 	$(CC) -o $(EXE) $(OBJS) resource.o $(LDFLAGS)
 
 .c.o:
 	$(CC) -c $(CFLAGS) $<
-bm2mem.o: m6800.h bm2.h depend.h
-bm2sub.o: m6800.h bm2.h depend.h
-depend.o: m6800.h bm2.h depend.h bm2icon.xpm
-main.o: m6800.h bm2.h depend.h
-sound.o: m6800.h bm2.h depend.h
-m6800.o: m6800.h
-m6800mem.o: m6800.h
-m6800asm.o: m6800.h
+bm2mem.o: bm2.h depend.h
+bm2sub.o: bm2.h depend.h
+depend.o: bm2.h depend.h bm2icon.xpm
+main.o: bm2.h depend.h
+sound.o: bm2.h depend.h
 menu.o: menu.c bm2.h depend.h
 	$(CC) -c $(CFLAGS) -Os $<
 init.o: init.c bm2.h depend.h
@@ -52,7 +50,7 @@ src:
 	mkdir bm2
 	nkf -w8 readme.txt | sed 's/\r//' > bm2/readme.txt
 	nkf -w8 bm2config.linux | sed 's/\r//' > bm2/bm2config
-	cp -p main.c bm2.h m6800.c m6800.h m6800asm.c bm2mem.c bm2sub.c sound.c util.c menu.c init.c depend.c depend.h srecord.c srecord.h conf.c conf.h sdlxpm.c sdlxpm.h bm2icon.xpm Makefile chr.bmp bm2/
+	cp -p main.c bm2.h bm2mem.c bm2sub.c sound.c util.c menu.c init.c depend.c depend.h srecord.c srecord.h conf.c conf.h sdlxpm.c sdlxpm.h bm2icon.xpm Makefile chr.bmp bm2/
 	tar -c bm2/ | gzip -9 > bm2src.tgz
 	rm -r -f bm2
 win32arc:

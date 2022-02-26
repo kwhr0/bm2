@@ -1,6 +1,6 @@
 /*
-	“ú—§ƒx[ƒVƒbƒNƒ}ƒXƒ^[Jr.ƒGƒ~ƒ…ƒŒ[ƒ^
-	ŠÂ‹«ˆË‘¶
+	æ—¥ç«‹ãƒ™ãƒ¼ã‚·ãƒƒã‚¯ãƒžã‚¹ã‚¿ãƒ¼Jr.ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿
+	ç’°å¢ƒä¾å­˜
 */
 
 #if !defined(DEPEND_H)
@@ -12,7 +12,7 @@
 #define printf	SDL_Log
 #endif
 
-/* PC(ƒGƒ~ƒ…ƒŒ[ƒg‚·‚é‘¤)‚ÌƒL[ƒR[ƒh */
+/* PC(ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆã™ã‚‹å´)ã®ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ */
 #if SDL_MAJOR_VERSION == 2
 #define KEY_NONE	0
 #define KEY_BACKSPACE	SDL_SCANCODE_BACKSPACE

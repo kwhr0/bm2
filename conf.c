@@ -1,5 +1,5 @@
 /*
-	Ý’èƒtƒ@ƒCƒ‹ˆ—(conf.c)
+	è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«å‡¦ç†(conf.c)
 */
 
 #include <stdio.h>
@@ -15,7 +15,7 @@
 #define COMMENT	'#'
 
 /*
-	ŽÀsƒtƒ@ƒCƒ‹‚ÌƒfƒBƒŒƒNƒgƒŠ‚ð“¾‚é (win32ê—p)
+	å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’å¾—ã‚‹ (win32å°‚ç”¨)
 */
 static char *getexedir(void)
 {
@@ -35,7 +35,7 @@ static char *getexedir(void)
 }
 
 /*
-	ŽÀsƒtƒ@ƒCƒ‹‚Ìˆø”‚©‚çƒIƒvƒVƒ‡ƒ“‚ð“¾‚é
+	å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ã®å¼•æ•°ã‹ã‚‰ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’å¾—ã‚‹
 */
 static int readArg(Conf *conf, char *argv)
 {
@@ -66,7 +66,7 @@ static int readArg(Conf *conf, char *argv)
 }
 
 /*
-	Configƒtƒ@ƒCƒ‹‚ðƒI[ƒvƒ“‚·‚é
+	Configãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚ªãƒ¼ãƒ—ãƒ³ã™ã‚‹
 */
 static FILE *openConfig(const char *file)
 {
@@ -93,13 +93,13 @@ static FILE *openConfig(const char *file)
 }
 
 /*
-	ƒtƒ@ƒCƒ‹‚©‚çƒIƒvƒVƒ‡ƒ“‚ð“¾‚é
+	ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’å¾—ã‚‹
 */
 static int readConfig(FILE *fp, Conf *conf)
 {
 	char buf[160], *p, *q;
 
-	/* ¶•Ó‚ð“¾‚é */
+	/* å·¦è¾ºã‚’å¾—ã‚‹ */
 	fgets(buf, sizeof(buf), fp);
 	for(p = buf; *p == ' ' || *p == '\t'; p++)
 		;
@@ -110,7 +110,7 @@ static int readConfig(FILE *fp, Conf *conf)
 	memcpy(conf->key, p, (int )(q - p));
 	*(conf->key + (int )(q - p)) = '\0';
 	
-	/* ‰E•Ó‚ð“¾‚é */
+	/* å³è¾ºã‚’å¾—ã‚‹ */
 	for(p = q; *p == ' ' || *p == '\t'; p++)
 		;
 	for(q = p; *q != '\r' && *q != '\n' && *q != 0 && *q != COMMENT; q++)
@@ -126,7 +126,7 @@ static int readConfig(FILE *fp, Conf *conf)
 }
 
 /*
-	Configƒtƒ@ƒCƒ‹‚ð“Ç‚Ýž‚Þ 
+	Configãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€ 
 */
 Conf *getConfig(Conf *conf, int length, const char *file, int argc, char *argv[])
 {
@@ -136,7 +136,7 @@ Conf *getConfig(Conf *conf, int length, const char *file, int argc, char *argv[]
 
 	strcpy(p->key, "");
 	
-	/* ŽÀsƒtƒ@ƒCƒ‹‚Ìˆø”‚©‚çƒIƒvƒVƒ‡ƒ“‚ð“¾‚é */
+	/* å®Ÿè¡Œãƒ•ã‚¡ã‚¤ãƒ«ã®å¼•æ•°ã‹ã‚‰ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’å¾—ã‚‹ */
 	line = INT_MIN;
 	for(i = 1; i < argc && p < last; i++) {
 		if(readArg(p, argv[i]))
@@ -144,7 +144,7 @@ Conf *getConfig(Conf *conf, int length, const char *file, int argc, char *argv[]
 		line++;
 	}
 
-	/* ƒtƒ@ƒCƒ‹‚©‚çƒIƒvƒVƒ‡ƒ“‚ð“¾‚é */
+	/* ãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’å¾—ã‚‹ */
 	if((fp = openConfig(file)) != NULL) {
 		line = 1;
 		while(!feof(fp) && p < last) {
@@ -159,7 +159,7 @@ Conf *getConfig(Conf *conf, int length, const char *file, int argc, char *argv[]
 }
 
 /*
-	Configƒtƒ@ƒCƒ‹‚©‚ç•¶Žš—ñ‚ðŽæ‚èo‚·
+	Configãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰æ–‡å­—åˆ—ã‚’å–ã‚Šå‡ºã™
 */
 const char *getOptText(const Conf *conf, const char *key, const char *default_value)
 {
@@ -172,7 +172,7 @@ const char *getOptText(const Conf *conf, const char *key, const char *default_va
 }
 
 /*
-	Configƒtƒ@ƒCƒ‹‚©‚ç”’l‚ðŽæ‚èo‚·(10i”)
+	Configãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰æ•°å€¤ã‚’å–ã‚Šå‡ºã™(10é€²æ•°)
 */
 int getOptInt(const Conf *conf, const char *key, int default_value)
 {
@@ -186,7 +186,7 @@ int getOptInt(const Conf *conf, const char *key, int default_value)
 }
 
 /*
-	Configƒtƒ@ƒCƒ‹‚©‚ç”’l‚ðŽæ‚èo‚·(16i”)
+	Configãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰æ•°å€¤ã‚’å–ã‚Šå‡ºã™(16é€²æ•°)
 */
 unsigned int getOptHex(const Conf *conf, const char *key, unsigned int default_value)
 {
@@ -202,7 +202,7 @@ unsigned int getOptHex(const Conf *conf, const char *key, unsigned int default_v
 }
 
 /*
-	Configƒtƒ@ƒCƒ‹‚©‚ç•¶Žš—ñ‚ðŽæ‚èo‚µ, ƒe[ƒuƒ‹‚ð—˜—p‚µ‚Ä”’l‚É•ÏŠ·‚·‚é
+	Configãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰æ–‡å­—åˆ—ã‚’å–ã‚Šå‡ºã—, ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’åˆ©ç”¨ã—ã¦æ•°å€¤ã«å¤‰æ›ã™ã‚‹
 */
 static int textToInt(const OptTable *table, const char *str, int default_value)
 {
@@ -219,7 +219,7 @@ int getOptTable(const Conf *conf, const char *key, const OptTable *table, int de
 }
 
 /*
-	~‚ðƒz[ƒ€ƒfƒBƒŒƒNƒgƒŠ‚É’u‚«Š·‚¦‚é
+	~ã‚’ãƒ›ãƒ¼ãƒ ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã«ç½®ãæ›ãˆã‚‹
 */
 char *setHomeDir(char *buf, const char *path)
 {

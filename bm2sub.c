@@ -1,6 +1,6 @@
 /*
-	“ú—§ƒx[ƒVƒbƒNƒ}ƒXƒ^[Jr.ƒGƒ~ƒ…ƒŒ[ƒ^
-	ƒTƒuƒ‹[ƒ`ƒ“
+	æ—¥ç«‹ãƒ™ãƒ¼ã‚·ãƒƒã‚¯ãƒã‚¹ã‚¿ãƒ¼Jr.ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿
+	ã‚µãƒ–ãƒ«ãƒ¼ãƒãƒ³
 */
 
 #include <stdio.h>
@@ -8,14 +8,18 @@
 #include <limits.h>
 #include <stdarg.h>
 #include "bm2.h"
+#include "test.h"
+#include "memory.h"
 
 #define MSTTOP	0x003b
 #define MSTEND	0x003d
 #define CPYTOP	0x003f
 #define CPYEND	0x0041
 
+#ifdef CURMPU
+
 /*
-	ƒeƒLƒXƒg‚ğÁ‹‚·‚é ($e14f) (m68subroutine‚Ì‰º¿‚¯)
+	ãƒ†ã‚­ã‚¹ãƒˆã‚’æ¶ˆå»ã™ã‚‹ ($e14f) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int clrtxt(struct M68stat *m68)
 {
@@ -25,7 +29,7 @@ static int clrtxt(struct M68stat *m68)
 }
 
 /*
-	ƒOƒ‰ƒtƒBƒbƒNƒy[ƒW1‚ğÁ‹‚·‚é ($e38d) (m68subroutine‚Ì‰º¿‚¯)
+	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒšãƒ¼ã‚¸1ã‚’æ¶ˆå»ã™ã‚‹ ($e38d) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int clrgrp1(struct M68stat *m68)
 {
@@ -35,7 +39,7 @@ static int clrgrp1(struct M68stat *m68)
 }
 
 /*
-	ƒOƒ‰ƒtƒBƒbƒNƒy[ƒW2‚ğÁ‹‚·‚é ($e39c) (m68subroutine‚Ì‰º¿‚¯)
+	ã‚°ãƒ©ãƒ•ã‚£ãƒƒã‚¯ãƒšãƒ¼ã‚¸2ã‚’æ¶ˆå»ã™ã‚‹ ($e39c) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int clrgrp2(struct M68stat *m68)
 {
@@ -45,7 +49,7 @@ static int clrgrp2(struct M68stat *m68)
 }
 
 /*
-	X := X + B ($f003) (m68subroutine‚Ì‰º¿‚¯)
+	X := X + B ($f003) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int addixb(struct M68stat *m68)
 {
@@ -54,7 +58,7 @@ static int addixb(struct M68stat *m68)
 }
 
 /*
-	ƒuƒƒbƒN“]‘— ($f009) (m68subroutine‚Ì‰º¿‚¯)
+	ãƒ–ãƒ­ãƒƒã‚¯è»¢é€ ($f009) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int movblk(struct M68stat *m68)
 {
@@ -73,7 +77,7 @@ static int movblk(struct M68stat *m68)
 }
 	
 /*
-	‰¹‚ğo—Í‚·‚é ($f00c) (m68subroutine‚Ì‰º¿‚¯)
+	éŸ³ã‚’å‡ºåŠ›ã™ã‚‹ ($f00c) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int music(struct M68stat *m68)
 {
@@ -93,12 +97,12 @@ static int music(struct M68stat *m68)
 
 	while(*p != 0x0d && *p != 0x00) {
 		switch(*p++) {
-		case '#':	/* ƒVƒƒ[ƒv */
-		case 'B':	/* ƒtƒ‰ƒbƒg */
-		case 'D':	/* ‰¹’öD */
-		case 'U':	/* ‰¹’öU */
+		case '#':	/* ã‚·ãƒ£ãƒ¼ãƒ— */
+		case 'B':	/* ãƒ•ãƒ©ãƒƒãƒˆ */
+		case 'D':	/* éŸ³ç¨‹D */
+		case 'U':	/* éŸ³ç¨‹U */
 			break;
-		case 'M':	/* ˆÚ’² */
+		case 'M':	/* ç§»èª¿ */
 			switch(*p++) {
 			case 0:
 				p--; break;
@@ -107,8 +111,8 @@ static int music(struct M68stat *m68)
 				p++; break;
 			}
 			break;
-		case 'V':	/* ƒ{ƒŠƒ…[ƒ€ */
-		case 'Q':	/* ‰¹F */
+		case 'V':	/* ãƒœãƒªãƒ¥ãƒ¼ãƒ  */
+		case 'Q':	/* éŸ³è‰² */
 			switch(*p++) {
 			case '0':
 			case '1':
@@ -121,7 +125,7 @@ static int music(struct M68stat *m68)
 				p--; break;
 			}
 			break;
-		case 'T':	/* ƒeƒ“ƒ| */
+		case 'T':	/* ãƒ†ãƒ³ãƒ */
 			switch(*p++) {
 			case 0:
 				p--; break;
@@ -143,7 +147,7 @@ static int music(struct M68stat *m68)
 				tempo = 80; p--; break;
 			}
 			break;
-		case 'P':	/* ‰¹‚Ì’·‚³ */
+		case 'P':	/* éŸ³ã®é•·ã• */
 			switch(*p++) {
 			case 0:
 				p--; break;
@@ -171,14 +175,14 @@ static int music(struct M68stat *m68)
 				len = 8; p--; break;
 			}
 			break;
-		case 0xc4:	/* ƒh */
-		case 0xda:	/* ƒŒ */
-		case 0xd0:	/* ƒ~ */
-		case 0xcc:	/* ƒtƒ@ */
-		case 0xbf:	/* ƒ\ */
-		case 0xd7:	/* ƒ‰ */
-		case 0xbc:	/* ƒV */
-		case 'R':	/* ‹x•„ */
+		case 0xc4:	/* ãƒ‰ */
+		case 0xda:	/* ãƒ¬ */
+		case 0xd0:	/* ãƒŸ */
+		case 0xcc:	/* ãƒ•ã‚¡ */
+		case 0xbf:	/* ã‚½ */
+		case 0xd7:	/* ãƒ© */
+		case 0xbc:	/* ã‚· */
+		case 'R':	/* ä¼‘ç¬¦ */
 			delay(bm2->fast ? 0: 60 * 1000 * len / 8 / tempo);
 			break;
 		}
@@ -187,7 +191,7 @@ static int music(struct M68stat *m68)
 }
 
 /*
-	ƒL[‚ğ“¾‚é ($f00f) (m68subroutine‚Ì‰º¿‚¯)
+	ã‚­ãƒ¼ã‚’å¾—ã‚‹ ($f00f) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int kbin(struct M68stat *m68)
 {
@@ -286,7 +290,7 @@ static int kbin(struct M68stat *m68)
 static int chrout(struct M68stat *);
 
 /*
-	ƒL[‚ğ“¾‚Ä‰æ–Ê‚Éo—Í‚·‚é ($f012) (m68subroutine‚Ì‰º¿‚¯)
+	ã‚­ãƒ¼ã‚’å¾—ã¦ç”»é¢ã«å‡ºåŠ›ã™ã‚‹ ($f012) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int chrget(struct M68stat *m68)
 {
@@ -314,7 +318,7 @@ static int chrget(struct M68stat *m68)
 }
 
 /*
-	‰º‚ÉƒXƒNƒ[ƒ‹‚·‚é (‰º¿‚¯)
+	ä¸‹ã«ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static void _scrollDown(struct M68stat *m68)
 {
@@ -327,7 +331,7 @@ static void _scrollDown(struct M68stat *m68)
 }
 
 /*
-	ã‚ÉƒXƒNƒ[ƒ‹‚·‚é (‰º¿‚¯)
+	ä¸Šã«ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static void _scrollUp(struct M68stat *m68)
 {
@@ -340,7 +344,7 @@ static void _scrollUp(struct M68stat *m68)
 }
 
 /*
-	ã‚ÉƒXƒNƒ[ƒ‹‚·‚é (‰º¿‚¯)
+	ä¸Šã«ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static void scrollUp(struct M68stat *m68, uint16 *p)
 {
@@ -351,7 +355,7 @@ static void scrollUp(struct M68stat *m68, uint16 *p)
 }
 
 /*
-	‰æ–Ê‚ğÁ‹‚·‚é (‰º¿‚¯)
+	ç”»é¢ã‚’æ¶ˆå»ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static void clear(struct M68stat *m68)
 {
@@ -362,32 +366,32 @@ static void clear(struct M68stat *m68)
 }
 
 /*
-	1•¶š•\¦‚·‚é ($f015) (m68subroutine‚Ì‰º¿‚¯)
+	1æ–‡å­—è¡¨ç¤ºã™ã‚‹ ($f015) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int chrout(struct M68stat *m68)
 {
 	uint16 p;
 
 	switch(m68->a) {
-	case 0x01:	/* $00~$0F‚ğo—Í */
+	case 0x01:	/* $00~$0Fã‚’å‡ºåŠ› */
 		return 0;
-	case 0x02:	/* ãƒXƒNƒ[ƒ‹ */
+	case 0x02:	/* ä¸Šã‚¹ã‚¯ãƒ­ãƒ¼ãƒ« */
 		_scrollUp(m68);
 		return 0;
-	case 0x03:	/* ‰ºƒXƒNƒ[ƒ‹ */
+	case 0x03:	/* ä¸‹ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ« */
 		_scrollDown(m68);
 		return 0;
 	case 0x00:
-	case 0x04:	/* ‰½‚à‚µ‚È‚¢ */
+	case 0x04:	/* ä½•ã‚‚ã—ãªã„ */
 		return 0;
-	case 0x05:	/* ƒJ[ƒ\ƒ‹•\¦ */
-	case 0x06:	/* ƒJ[ƒ\ƒ‹Á‹ */
-	case 0x07:	/* ƒxƒ‹ */
+	case 0x05:	/* ã‚«ãƒ¼ã‚½ãƒ«è¡¨ç¤º */
+	case 0x06:	/* ã‚«ãƒ¼ã‚½ãƒ«æ¶ˆå» */
+	case 0x07:	/* ãƒ™ãƒ« */
 		return 0;
-	case 0x0e:	/* ”½“] */
+	case 0x0e:	/* åè»¢ */
 		m68write8(m68, 0xee40, 0xff);
 		return 0;
-	case 0x0f:	/* ”½“]‰ğœ */
+	case 0x0f:	/* åè»¢è§£é™¤ */
 		m68write8(m68, 0xee40, 0x00);
 		return 0;
 	}
@@ -396,27 +400,27 @@ static int chrout(struct M68stat *m68)
 	scrollUp(m68, &p);
 
 	switch(m68->a) {
-	case 0x08:	/* ƒJ[ƒ\ƒ‹¶ˆÚ“® */
+	case 0x08:	/* ã‚«ãƒ¼ã‚½ãƒ«å·¦ç§»å‹• */
 		if(p > 0x100)
 			p--;
 		break;
-	case 0x09:	/* ƒJ[ƒ\ƒ‹‰EˆÚ“® */
+	case 0x09:	/* ã‚«ãƒ¼ã‚½ãƒ«å³ç§»å‹• */
 		if(p < 0x400)
 			p++;
 		break;
-	case 0x0a:	/* ƒJ[ƒ\ƒ‹ãˆÚ“® */
+	case 0x0a:	/* ã‚«ãƒ¼ã‚½ãƒ«ä¸Šç§»å‹• */
 		if(p < 0x400 - 0x20)
 			p += 0x20;
 		break;
-	case 0x0b:	/* ƒJ[ƒ\ƒ‹‰ºˆÚ“® */
+	case 0x0b:	/* ã‚«ãƒ¼ã‚½ãƒ«ä¸‹ç§»å‹• */
 		if(p > 0x100 + 0x20)
 			p -= 0x20;
 		break;
-	case 0x0c:	/* ƒNƒŠƒA */
+	case 0x0c:	/* ã‚¯ãƒªã‚¢ */
 		clear(m68);
 		p = 0x100;
 		break;
-	case 0x0d:	/* ƒJ[ƒ\ƒ‹‚ğŸ‚Ìs‚Ìæ“ª‚ÉˆÚ“®‚·‚é */
+	case 0x0d:	/* ã‚«ãƒ¼ã‚½ãƒ«ã‚’æ¬¡ã®è¡Œã®å…ˆé ­ã«ç§»å‹•ã™ã‚‹ */
 		p = (((p - 0x100) / 0x20) * 0x20) + 0x120;
 		break;
 	case 0x7f:	/* DEL */
@@ -424,7 +428,7 @@ static int chrout(struct M68stat *m68)
 			p--;
 		m68write8(m68, p, 0x20);
 		break;
-	default:	/* •¶šo—Í */
+	default:	/* æ–‡å­—å‡ºåŠ› */
 		m68write8(m68, p, m68->a);
 		p++;
 		break;
@@ -438,7 +442,7 @@ static int chrout(struct M68stat *m68)
 }
 
 /*
-	ƒtƒ@ƒCƒ‹–¼‚ğ“¾‚é (‰º¿‚¯)
+	ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å¾—ã‚‹ (ä¸‹è«‹ã‘)
 */
 static char *getFileName(struct M68stat *m68, uint16 address, char *file)
 {
@@ -454,7 +458,7 @@ static char *getFileName(struct M68stat *m68, uint16 address, char *file)
 }
 
 /*
-	ƒe[ƒv‚©‚ç“Ç‚İ‚Ş ($f018) (m68subroutine‚Ì‰º¿‚¯)
+	ãƒ†ãƒ¼ãƒ—ã‹ã‚‰èª­ã¿è¾¼ã‚€ ($f018) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int load(struct M68stat *m68)
 {
@@ -475,7 +479,7 @@ static int load(struct M68stat *m68)
 }
 
 /*
-	ƒe[ƒv‚É‘‚«‚Ş ($f01b) (m68subroutine‚Ì‰º¿‚¯)
+	ãƒ†ãƒ¼ãƒ—ã«æ›¸ãè¾¼ã‚€ ($f01b) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int save(struct M68stat *m68)
 {
@@ -494,7 +498,7 @@ static int save(struct M68stat *m68)
 }
 
 /*
-	ƒ^ƒCƒ}Š„‚è‚İ ($f04d) (m68subroutine‚Ì‰º¿‚¯)
+	ã‚¿ã‚¤ãƒå‰²ã‚Šè¾¼ã¿ ($f04d) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int timer(struct M68stat *m68)
 {
@@ -509,7 +513,7 @@ static int timer(struct M68stat *m68)
 }
 
 /*
-	BREAKŠ„‚è‚İ‚ğ‹Ö~‚·‚é ($ffe6) (m68subroutine‚Ì‰º¿‚¯)
+	BREAKå‰²ã‚Šè¾¼ã¿ã‚’ç¦æ­¢ã™ã‚‹ ($ffe6) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int nmiset(struct M68stat *m68)
 {
@@ -520,7 +524,7 @@ static int nmiset(struct M68stat *m68)
 }
 
 /*
-	BREAKŠ„‚è‚İ‚ğ‹–‰Â‚·‚é ($ffe9) (m68subroutine‚Ì‰º¿‚¯)
+	BREAKå‰²ã‚Šè¾¼ã¿ã‚’è¨±å¯ã™ã‚‹ ($ffe9) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int nmiclr(struct M68stat *m68)
 {
@@ -531,7 +535,7 @@ static int nmiclr(struct M68stat *m68)
 }
 
 /*
-	XƒŒƒWƒXƒ^‚Ì’l‚ğ•\¦‚·‚é ($ffec) (m68subroutine‚Ì‰º¿‚¯)
+	Xãƒ¬ã‚¸ã‚¹ã‚¿ã®å€¤ã‚’è¡¨ç¤ºã™ã‚‹ ($ffec) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int outix(struct M68stat *m68)
 {
@@ -552,7 +556,7 @@ static int outix(struct M68stat *m68)
 }
 
 /*
-	‰æ–Ê‚ğÁ‹‚·‚é ($ffef) (m68subroutine‚Ì‰º¿‚¯)
+	ç”»é¢ã‚’æ¶ˆå»ã™ã‚‹ ($ffef) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int clrtv(struct M68stat *m68)
 {
@@ -565,7 +569,7 @@ static int clrtv(struct M68stat *m68)
 }
 
 /*
-	•¶š—ñ‚ğ•\¦‚·‚é ($fff2) (m68subroutine‚Ì‰º¿‚¯)
+	æ–‡å­—åˆ—ã‚’è¡¨ç¤ºã™ã‚‹ ($fff2) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int mesout(struct M68stat *m68)
 {
@@ -578,7 +582,7 @@ static int mesout(struct M68stat *m68)
 }
 
 /*
-	ƒJ[ƒ\ƒ‹ˆÊ’u‚ÌƒAƒhƒŒƒX‚ğ“¾‚é ($fff5) (m68subroutine‚Ì‰º¿‚¯)
+	ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å¾—ã‚‹ ($fff5) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int curpos(struct M68stat *m68)
 {
@@ -587,7 +591,7 @@ static int curpos(struct M68stat *m68)
 }
 
 /*
-	ƒJ[ƒ\ƒ‹ˆÊ’u‚ğİ’è‚·‚é
+	ã‚«ãƒ¼ã‚½ãƒ«ä½ç½®ã‚’è¨­å®šã™ã‚‹
 */
 void locate(struct Bm2stat *bm2, int x, int y)
 {
@@ -596,7 +600,7 @@ void locate(struct Bm2stat *bm2, int x, int y)
 }
 
 /*
-	•¶š—ñ‚ğ•\¦‚·‚é
+	æ–‡å­—åˆ—ã‚’è¡¨ç¤ºã™ã‚‹
 */
 void print(struct Bm2stat *bm2, const char *str, ...)
 {
@@ -619,8 +623,10 @@ void print(struct Bm2stat *bm2, const char *str, ...)
 	bm2->cpu.a = a;
 }
 
+#endif // CURMPU
+
 /*
-	•¶š‚Ì“ü—Í‚ğ“¾‚é
+	æ–‡å­—ã®å…¥åŠ›ã‚’å¾—ã‚‹
 */
 char getkey(struct Bm2stat *bm2)
 {
@@ -638,7 +644,7 @@ char getkey(struct Bm2stat *bm2)
 }
 
 /*
-	•¶š—ñ‚Ì“ü—Í‚ğ“¾‚é
+	æ–‡å­—åˆ—ã®å…¥åŠ›ã‚’å¾—ã‚‹
 */
 static char _getstr(struct Bm2stat *bm2, char *buf, int flag)
 {
@@ -683,17 +689,21 @@ static char _getstr(struct Bm2stat *bm2, char *buf, int flag)
 		}
 	}
 }
+
 char getstr(struct Bm2stat *bm2, char *buf)
 {
 	return _getstr(bm2, buf, FALSE);
 }
+
 char getkeystr(struct Bm2stat *bm2, char *buf)
 {
 	return _getstr(bm2, buf, TRUE);
 }
 
+#ifdef CURMPU
+
 /*
-	16i”4Œ…‚Ì“ü—Í‚ğ“¾‚é (monitor‚Ì‰º¿‚¯)
+	16é€²æ•°4æ¡ã®å…¥åŠ›ã‚’å¾—ã‚‹ (monitorã®ä¸‹è«‹ã‘)
 */
 static int gethex4(struct Bm2stat *bm2)
 {
@@ -750,7 +760,7 @@ static int gethex4(struct Bm2stat *bm2)
 }
 
 /*
-	ƒ‚ƒjƒ^ ($f000) (m68subroutine‚Ì‰º¿‚¯)
+	ãƒ¢ãƒ‹ã‚¿ ($f000) (m68subroutineã®ä¸‹è«‹ã‘)
 */
 static int monitor(struct M68stat *m68)
 {
@@ -801,7 +811,7 @@ last:;
 }
 
 /*
-	ƒTƒuƒ‹[ƒ`ƒ“‚ğƒGƒ~ƒ…ƒŒ[ƒg‚·‚é
+	ã‚µãƒ–ãƒ«ãƒ¼ãƒãƒ³ã‚’ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ãƒˆã™ã‚‹
 */
 int m68subroutine(struct M68stat *m68, uint16 address)
 {
@@ -860,6 +870,13 @@ int m68subroutine(struct M68stat *m68, uint16 address)
 	}
 	return 0;
 }
+
+#else // CURMPU
+
+void locate(struct Bm2stat *bm2, int x, int y) {}
+void print(struct Bm2stat *bm2, const char *str, ...) {}
+
+#endif // CURMPU
 
 /*
 	Copyright 2008, 2014 maruhiro

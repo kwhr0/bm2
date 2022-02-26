@@ -1,6 +1,6 @@
 /*
-	“ú—§ƒx[ƒVƒbƒNƒ}ƒXƒ^[Jr.ƒGƒ~ƒ…ƒŒ[ƒ^
-	ƒƒjƒ…[
+	æ—¥ç«‹ãƒ™ãƒ¼ã‚·ãƒƒã‚¯ãƒã‚¹ã‚¿ãƒ¼Jr.ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿
+	ãƒ¡ãƒ‹ãƒ¥ãƒ¼
 */
 
 #include <stdio.h>
@@ -8,6 +8,7 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <string.h>
+#include <unistd.h>
 #include "bm2.h"
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
@@ -15,13 +16,13 @@
 #include <windows.h>
 
 /*
-	ƒtƒ@ƒCƒ‹–¼‚Ì“ü—Í‚ğ“¾‚é(Windows)
+	ãƒ•ã‚¡ã‚¤ãƒ«åã®å…¥åŠ›ã‚’å¾—ã‚‹(Windows)
 */
 int inputFileName(struct Bm2stat *bm2, char *path, unsigned int filter)
 {
 	const char *text_table[][3] = {
 		{ "Tape file (*.bin)", "Binary file (*.B)", "All files (*.*)" },
-		{ "ƒe[ƒvƒCƒ[ƒW(*.bin)", "ƒoƒCƒiƒŠƒtƒ@ƒCƒ‹(*.B)", "‘S‚Ä‚Ìƒtƒ@ƒCƒ‹(*.*)" }
+		{ "ãƒ†ãƒ¼ãƒ—ã‚¤ãƒ¡ãƒ¼ã‚¸(*.bin)", "ãƒã‚¤ãƒŠãƒªãƒ•ã‚¡ã‚¤ãƒ«(*.B)", "å…¨ã¦ã®ãƒ•ã‚¡ã‚¤ãƒ«(*.*)" }
 	};
 	const char *ext[] = { "*.bin", "*.B", "*.*" };
 	const char **text;
@@ -30,9 +31,9 @@ int inputFileName(struct Bm2stat *bm2, char *path, unsigned int filter)
 	char filter_text[256] = "", *p = filter_text;
 
 	lcid = GetUserDefaultLCID();
-	if(lcid == 1041) /* “ú–{Œê */
+	if(lcid == 1041) /* æ—¥æœ¬èª */
 		text = text_table[1];
-	else /* ‚»‚Ì‘¼(‰pŒê) */
+	else /* ãã®ä»–(è‹±èª) */
 		text = text_table[0];
 
 	if(filter & FILTER_TAPE) {
@@ -64,7 +65,7 @@ int inputFileName(struct Bm2stat *bm2, char *path, unsigned int filter)
 #define MAX(a, b)	((a) > (b) ? (a): (b))
 
 /*
-	ƒfƒBƒŒƒNƒgƒŠ‚ğ“¾‚é(‰º¿‚¯)
+	ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’å¾—ã‚‹(ä¸‹è«‹ã‘)
 */
 static char *getDir(char *dir, const char *path)
 {
@@ -78,7 +79,7 @@ static char *getDir(char *dir, const char *path)
 }
 
 /*
-	ƒtƒ@ƒCƒ‹–¼‚ğ“¾‚é(‰º¿‚¯)
+	ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å¾—ã‚‹(ä¸‹è«‹ã‘)
 */
 static char *getFile(char *file, const char *path)
 {
@@ -94,7 +95,7 @@ static char *getFile(char *file, const char *path)
 }
 
 /*
-	ƒtƒ@ƒCƒ‹‚Ìí—Ş‚ğ“¾‚é(‰º¿‚¯)
+	ãƒ•ã‚¡ã‚¤ãƒ«ã®ç¨®é¡ã‚’å¾—ã‚‹(ä¸‹è«‹ã‘)
 */
 static int getFileType(const char *path)
 {
@@ -117,7 +118,7 @@ static int getFileType(const char *path)
 }
 
 /*
-	ƒtƒ@ƒCƒ‹–¼‚ğ”äŠr‚·‚é(‰º¿‚¯)
+	ãƒ•ã‚¡ã‚¤ãƒ«åã‚’æ¯”è¼ƒã™ã‚‹(ä¸‹è«‹ã‘)
 */
 static int cmpfile(const void *a, const void *b)
 {
@@ -128,7 +129,7 @@ static int cmpfile(const void *a, const void *b)
 }
 
 /*
-	ƒtƒ@ƒCƒ‹–¼‚Ìˆê——‚ğ•\¦‚·‚é (‰º¿‚¯)
+	ãƒ•ã‚¡ã‚¤ãƒ«åã®ä¸€è¦§ã‚’è¡¨ç¤ºã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 static int printFileList(struct Bm2stat *bm2, const char *base_name, int filter)
 {
@@ -171,7 +172,7 @@ static int printFileList(struct Bm2stat *bm2, const char *base_name, int filter)
 }
 
 /*
-	ƒtƒ@ƒCƒ‹–¼‚Ì“ü—Í‚ğ“¾‚é(UNIX)
+	ãƒ•ã‚¡ã‚¤ãƒ«åã®å…¥åŠ›ã‚’å¾—ã‚‹(UNIX)
 */
 int inputFileName(struct Bm2stat *bm2orig, char *path, unsigned int filter)
 {
@@ -205,7 +206,7 @@ int inputFileName(struct Bm2stat *bm2orig, char *path, unsigned int filter)
 #endif
 
 /*
-	ƒe[ƒvƒtƒ@ƒCƒ‹‚ğİ’è‚·‚é
+	ãƒ†ãƒ¼ãƒ—ãƒ•ã‚¡ã‚¤ãƒ«ã‚’è¨­å®šã™ã‚‹
 */
 void menu(struct Bm2stat *bm2)
 {

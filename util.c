@@ -1,40 +1,40 @@
 /*
-	“ú—§ƒx[ƒVƒbƒNƒ}ƒXƒ^[Jr.ƒGƒ~ƒ…ƒŒ[ƒ^
-	ƒ†[ƒeƒBƒŠƒeƒB
+	æ—¥ç«‹ãƒ™ãƒ¼ã‚·ãƒƒã‚¯ãƒã‚¹ã‚¿ãƒ¼Jr.ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿
+	ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£
 */
 
 #include <stdio.h>
 #include <string.h>
 #include "bm2.h"
 
-/* ¬‚³‚¢‚Ù‚¤‚Ì’l‚ğ–ß‚· */
+/* å°ã•ã„ã»ã†ã®å€¤ã‚’æˆ»ã™ */
 #define MIN(x, y)	((x) < (y) ? (x): (y))
 
-static char *autoKeyBuffer = NULL;	/* ©“®ƒL[“ü—Í‚Ìƒoƒbƒtƒ@ */
-static char *autoKeyPointer = NULL;	/* ©“®ƒL[“ü—Í‚Ì“Ç‚İ‚İƒ|ƒCƒ“ƒ^ */
-static int autoKeyCount = 0;	/* ©“®ƒL[“ü—Í‚ÌƒJƒEƒ“ƒ^ */
-static int autoKeyLastStates;	/* ÅŒã‚ÉƒL[“ü—Í‚µ‚½“_‚Ì—İÏƒXƒe[ƒg” */
+static char *autoKeyBuffer = NULL;	/* è‡ªå‹•ã‚­ãƒ¼å…¥åŠ›ã®ãƒãƒƒãƒ•ã‚¡ */
+static char *autoKeyPointer = NULL;	/* è‡ªå‹•ã‚­ãƒ¼å…¥åŠ›ã®èª­ã¿è¾¼ã¿ãƒã‚¤ãƒ³ã‚¿ */
+static int autoKeyCount = 0;	/* è‡ªå‹•ã‚­ãƒ¼å…¥åŠ›ã®ã‚«ã‚¦ãƒ³ã‚¿ */
+static int autoKeyLastStates;	/* æœ€å¾Œã«ã‚­ãƒ¼å…¥åŠ›ã—ãŸæ™‚ç‚¹ã®ç´¯ç©ã‚¹ãƒ†ãƒ¼ãƒˆæ•° */
 
 /*
-	UTF-8‚ğJIS X 0201‚É•ÏŠ·‚·‚é (startAutoKey‚Ì‰º¿‚¯)
+	UTF-8ã‚’JIS X 0201ã«å¤‰æ›ã™ã‚‹ (startAutoKeyã®ä¸‹è«‹ã‘)
 */
 static int convUtf8ToJisX0201(char *jis, const char *utf8)
 {
 	int utf16;
 
-	/* ASCIIƒR[ƒh‚Í‚»‚Ì‚Ü‚Ü–ß‚· */
+	/* ASCIIã‚³ãƒ¼ãƒ‰ã¯ãã®ã¾ã¾æˆ»ã™ */
 	if((unsigned int )utf8[0] < 0x80) {
 		*jis = utf8[0];
 		return 1;
 	}
 
-	/* CR+LF‚ğLF‚É‚·‚é */
+	/* CR+LFã‚’LFã«ã™ã‚‹ */
 	if(utf8[0] == 0x0d && utf8[1] == 0x0a) {
 		*jis = 0x0a;
 		return 2;
 	}
 
-	/* ”¼ŠpƒJƒi‚ğ•ÏŠ·‚·‚é */
+	/* åŠè§’ã‚«ãƒŠã‚’å¤‰æ›ã™ã‚‹ */
 	if((utf8[0] & 0xe0) == 0xc0) {
 		*jis = 0x20;
 		return 2;
@@ -49,7 +49,7 @@ static int convUtf8ToJisX0201(char *jis, const char *utf8)
 }
 
 /*
-	©“®ƒL[“ü—Í‚ğn‚ß‚é
+	è‡ªå‹•ã‚­ãƒ¼å…¥åŠ›ã‚’å§‹ã‚ã‚‹
 */
 void startAutoKey(struct Bm2stat *bm2, const char *str, int utf8)
 {
@@ -78,13 +78,13 @@ void startAutoKey(struct Bm2stat *bm2, const char *str, int utf8)
 }
 
 /*
-	©“®“ü—ÍƒL[‚ğ“¾‚é
+	è‡ªå‹•å…¥åŠ›ã‚­ãƒ¼ã‚’å¾—ã‚‹
 */
 int getAutoKey(struct Bm2stat *bm2, int *press, char *ch, int *key)
 {
 	const struct {
-		int mod;	/* ƒ‚ƒfƒtƒ@ƒCƒAƒL[ */
-		int key;	/* ƒL[ */
+		int mod;	/* ãƒ¢ãƒ‡ãƒ•ã‚¡ã‚¤ã‚¢ã‚­ãƒ¼ */
+		int key;	/* ã‚­ãƒ¼ */
 	} table[] = {
 		{ BMKEY_ALPHA, BMKEY_NONE },	/* NUL */
 		{ 0 },	/* SOH */
@@ -267,76 +267,76 @@ int getAutoKey(struct Bm2stat *bm2, int *press, char *ch, int *key)
 		{ 0 },	/* 0x9f */
 
 		{ 0 },	/* 0xa0 */
-		{ BMKEY_KSHIFT, BMKEY_PERIOD },	/* B */
-		{ BMKEY_KSHIFT, BMKEY_LEFTBRACKET },	/* u */
-		{ BMKEY_KSHIFT, BMKEY_RIGHTBRACKET },	/* v */
-		{ BMKEY_KSHIFT, BMKEY_COMMA },	/* A */
-		{ BMKEY_KSHIFT, BMKEY_SLASH },	/* E */
-		{ BMKEY_KSHIFT, BMKEY_0 },	/* ƒ’ */
-		{ BMKEY_KSHIFT, BMKEY_3 },	/* ƒ@ */
+		{ BMKEY_KSHIFT, BMKEY_PERIOD },	/* ã€‚ */
+		{ BMKEY_KSHIFT, BMKEY_LEFTBRACKET },	/* ã€Œ */
+		{ BMKEY_KSHIFT, BMKEY_RIGHTBRACKET },	/* ã€ */
+		{ BMKEY_KSHIFT, BMKEY_COMMA },	/* ã€ */
+		{ BMKEY_KSHIFT, BMKEY_SLASH },	/* ãƒ» */
+		{ BMKEY_KSHIFT, BMKEY_0 },	/* ãƒ² */
+		{ BMKEY_KSHIFT, BMKEY_3 },	/* ã‚¡ */
 
-		{ BMKEY_KSHIFT, BMKEY_E },	/* ƒB */
-		{ BMKEY_KSHIFT, BMKEY_4 },	/* ƒD */
-		{ BMKEY_KSHIFT, BMKEY_5 },	/* ƒF */
-		{ BMKEY_KSHIFT, BMKEY_6 },	/* ƒH */
-		{ BMKEY_KSHIFT, BMKEY_7 },	/* ƒƒ */
-		{ BMKEY_KSHIFT, BMKEY_8 },	/* ƒ… */
-		{ BMKEY_KSHIFT, BMKEY_9 },	/* ƒ‡ */
-		{ BMKEY_KSHIFT, BMKEY_Z },	/* ƒb */
+		{ BMKEY_KSHIFT, BMKEY_E },	/* ã‚£ */
+		{ BMKEY_KSHIFT, BMKEY_4 },	/* ã‚¥ */
+		{ BMKEY_KSHIFT, BMKEY_5 },	/* ã‚§ */
+		{ BMKEY_KSHIFT, BMKEY_6 },	/* ã‚© */
+		{ BMKEY_KSHIFT, BMKEY_7 },	/* ãƒ£ */
+		{ BMKEY_KSHIFT, BMKEY_8 },	/* ãƒ¥ */
+		{ BMKEY_KSHIFT, BMKEY_9 },	/* ãƒ§ */
+		{ BMKEY_KSHIFT, BMKEY_Z },	/* ãƒƒ */
 
-		{ BMKEY_KANA, BMKEY_YEN },	/* [ */
-		{ BMKEY_KANA, BMKEY_3 },	/* ƒA */
-		{ BMKEY_KANA, BMKEY_E },	/* ƒC */
-		{ BMKEY_KANA, BMKEY_4 },	/* ƒE */
-		{ BMKEY_KANA, BMKEY_5 },	/* ƒG */
-		{ BMKEY_KANA, BMKEY_6 },	/* ƒI */
-		{ BMKEY_KANA, BMKEY_T },	/* ƒJ */
-		{ BMKEY_KANA, BMKEY_G },	/* ƒL */
+		{ BMKEY_KANA, BMKEY_YEN },	/* ãƒ¼ */
+		{ BMKEY_KANA, BMKEY_3 },	/* ã‚¢ */
+		{ BMKEY_KANA, BMKEY_E },	/* ã‚¤ */
+		{ BMKEY_KANA, BMKEY_4 },	/* ã‚¦ */
+		{ BMKEY_KANA, BMKEY_5 },	/* ã‚¨ */
+		{ BMKEY_KANA, BMKEY_6 },	/* ã‚ª */
+		{ BMKEY_KANA, BMKEY_T },	/* ã‚« */
+		{ BMKEY_KANA, BMKEY_G },	/* ã‚­ */
 
-		{ BMKEY_KANA, BMKEY_H },	/* ƒN */
-		{ BMKEY_KANA, BMKEY_COLON },	/* ƒP */
-		{ BMKEY_KANA, BMKEY_B },	/* ƒR */
-		{ BMKEY_KANA, BMKEY_X },	/* ƒT */
-		{ BMKEY_KANA, BMKEY_D },	/* ƒV */
-		{ BMKEY_KANA, BMKEY_R },	/* ƒX */
-		{ BMKEY_KANA, BMKEY_P },	/* ƒZ */
-		{ BMKEY_KANA, BMKEY_C },	/* ƒ\ */
+		{ BMKEY_KANA, BMKEY_H },	/* ã‚¯ */
+		{ BMKEY_KANA, BMKEY_COLON },	/* ã‚± */
+		{ BMKEY_KANA, BMKEY_B },	/* ã‚³ */
+		{ BMKEY_KANA, BMKEY_X },	/* ã‚µ */
+		{ BMKEY_KANA, BMKEY_D },	/* ã‚· */
+		{ BMKEY_KANA, BMKEY_R },	/* ã‚¹ */
+		{ BMKEY_KANA, BMKEY_P },	/* ã‚» */
+		{ BMKEY_KANA, BMKEY_C },	/* ã‚½ */
 
-		{ BMKEY_KANA, BMKEY_Q },	/* ƒ^ */
-		{ BMKEY_KANA, BMKEY_A },	/* ƒ` */
-		{ BMKEY_KANA, BMKEY_Z },	/* ƒc */
-		{ BMKEY_KANA, BMKEY_W },	/* ƒe */
-		{ BMKEY_KANA, BMKEY_S },	/* ƒg */
-		{ BMKEY_KANA, BMKEY_U },	/* ƒi */
-		{ BMKEY_KANA, BMKEY_I },	/* ƒj */
-		{ BMKEY_KANA, BMKEY_1 },	/* ƒk */
+		{ BMKEY_KANA, BMKEY_Q },	/* ã‚¿ */
+		{ BMKEY_KANA, BMKEY_A },	/* ãƒ */
+		{ BMKEY_KANA, BMKEY_Z },	/* ãƒ„ */
+		{ BMKEY_KANA, BMKEY_W },	/* ãƒ† */
+		{ BMKEY_KANA, BMKEY_S },	/* ãƒˆ */
+		{ BMKEY_KANA, BMKEY_U },	/* ãƒŠ */
+		{ BMKEY_KANA, BMKEY_I },	/* ãƒ‹ */
+		{ BMKEY_KANA, BMKEY_1 },	/* ãƒŒ */
 
-		{ BMKEY_KANA, BMKEY_COMMA },	/* ƒl */
-		{ BMKEY_KANA, BMKEY_K },	/* ƒm */
-		{ BMKEY_KANA, BMKEY_F },	/* ƒn */
-		{ BMKEY_KANA, BMKEY_V },	/* ƒq */
-		{ BMKEY_KANA, BMKEY_2 },	/* ƒt */
-		{ BMKEY_KANA, BMKEY_CARET },	/* ƒw */
-		{ BMKEY_KANA, BMKEY_MINUS },	/* ƒz */
-		{ BMKEY_KANA, BMKEY_J },	/* ƒ} */
+		{ BMKEY_KANA, BMKEY_COMMA },	/* ãƒ */
+		{ BMKEY_KANA, BMKEY_K },	/* ãƒ */
+		{ BMKEY_KANA, BMKEY_F },	/* ãƒ */
+		{ BMKEY_KANA, BMKEY_V },	/* ãƒ’ */
+		{ BMKEY_KANA, BMKEY_2 },	/* ãƒ• */
+		{ BMKEY_KANA, BMKEY_CARET },	/* ãƒ˜ */
+		{ BMKEY_KANA, BMKEY_MINUS },	/* ãƒ› */
+		{ BMKEY_KANA, BMKEY_J },	/* ãƒ */
 
-		{ BMKEY_KANA, BMKEY_N },	/* ƒ~ */
-		{ BMKEY_KANA, BMKEY_RIGHTBRACKET },	/* ƒ€ */
-		{ BMKEY_KANA, BMKEY_SLASH },	/* ƒ */
-		{ BMKEY_KANA, BMKEY_M },	/* ƒ‚ */
-		{ BMKEY_KANA, BMKEY_7 },	/* ƒ„ */
-		{ BMKEY_KANA, BMKEY_8 },	/* ƒ† */
-		{ BMKEY_KANA, BMKEY_9 },	/* ƒˆ */
-		{ BMKEY_KANA, BMKEY_O },	/* ƒ‰ */
+		{ BMKEY_KANA, BMKEY_N },	/* ãƒŸ */
+		{ BMKEY_KANA, BMKEY_RIGHTBRACKET },	/* ãƒ  */
+		{ BMKEY_KANA, BMKEY_SLASH },	/* ãƒ¡ */
+		{ BMKEY_KANA, BMKEY_M },	/* ãƒ¢ */
+		{ BMKEY_KANA, BMKEY_7 },	/* ãƒ¤ */
+		{ BMKEY_KANA, BMKEY_8 },	/* ãƒ¦ */
+		{ BMKEY_KANA, BMKEY_9 },	/* ãƒ¨ */
+		{ BMKEY_KANA, BMKEY_O },	/* ãƒ© */
 
-		{ BMKEY_KANA, BMKEY_L },	/* ƒŠ */
-		{ BMKEY_KANA, BMKEY_PERIOD },	/* ƒ‹ */
-		{ BMKEY_KANA, BMKEY_SEMICOLON },	/* ƒŒ */
-		{ BMKEY_KANA, BMKEY_UNDERBAR },	/* ƒ */
-		{ BMKEY_KANA, BMKEY_0 },	/* ƒ */
-		{ BMKEY_KANA, BMKEY_Y },	/* ƒ“ */
-		{ BMKEY_KANA, BMKEY_AT },	/* J */
-		{ BMKEY_KANA, BMKEY_LEFTBRACKET },	/* K */
+		{ BMKEY_KANA, BMKEY_L },	/* ãƒª */
+		{ BMKEY_KANA, BMKEY_PERIOD },	/* ãƒ« */
+		{ BMKEY_KANA, BMKEY_SEMICOLON },	/* ãƒ¬ */
+		{ BMKEY_KANA, BMKEY_UNDERBAR },	/* ãƒ­ */
+		{ BMKEY_KANA, BMKEY_0 },	/* ãƒ¯ */
+		{ BMKEY_KANA, BMKEY_Y },	/* ãƒ³ */
+		{ BMKEY_KANA, BMKEY_AT },	/* ã‚› */
+		{ BMKEY_KANA, BMKEY_LEFTBRACKET },	/* ã‚œ */
 
 		{ 0 },	/* 0xe0 */
 		{ 0 },	/* 0xe1 */
@@ -375,17 +375,17 @@ int getAutoKey(struct Bm2stat *bm2, int *press, char *ch, int *key)
 		{ 0 }	/* 0xff */
 	};
 
-	/* ©“®ƒL[“ü—Í‚ª‚È‚¢‚©? */
+	/* è‡ªå‹•ã‚­ãƒ¼å…¥åŠ›ãŒãªã„ã‹? */
 	if(autoKeyPointer == NULL)
 		return FALSE;
 
-	/* ƒL[“ü—ÍŒã‚Ì‘Ò‚¿ŠÔ‚©? */
+	/* ã‚­ãƒ¼å…¥åŠ›å¾Œã®å¾…ã¡æ™‚é–“ã‹? */
 	if(!bm2->cpu.emulate_subroutine)
 		if(m68diff(m68states(&bm2->cpu), autoKeyLastStates) < 100000)
 			return FALSE;
 	autoKeyLastStates = m68states(&bm2->cpu);
 
-	/* •¶š‚ÆƒL[‚ğ“¾‚é */
+	/* æ–‡å­—ã¨ã‚­ãƒ¼ã‚’å¾—ã‚‹ */
 	*ch = *autoKeyPointer;
 
 	switch(autoKeyCount++) {
@@ -393,7 +393,7 @@ int getAutoKey(struct Bm2stat *bm2, int *press, char *ch, int *key)
 		if(table[(unsigned char )*ch].mod == BMKEY_NONE)
 			return FALSE;
 
-		/* ƒ‚ƒfƒtƒ@ƒCƒAƒL[‚ğ‰Ÿ‚· */
+		/* ãƒ¢ãƒ‡ãƒ•ã‚¡ã‚¤ã‚¢ã‚­ãƒ¼ã‚’æŠ¼ã™ */
 		*press = TRUE;
 		*key = table[(unsigned char )*ch].mod;
 		*ch = 0;
@@ -402,7 +402,7 @@ int getAutoKey(struct Bm2stat *bm2, int *press, char *ch, int *key)
 		if(table[(unsigned char )*ch].key == BMKEY_NONE)
 			return FALSE;
 
-		/* ƒL[‚ğ‰Ÿ‚· */
+		/* ã‚­ãƒ¼ã‚’æŠ¼ã™ */
 		*press = TRUE;
 		*key = table[(unsigned char )*ch].key;
 		return TRUE;
@@ -410,12 +410,12 @@ int getAutoKey(struct Bm2stat *bm2, int *press, char *ch, int *key)
 		if(table[(unsigned char )*ch].key == BMKEY_NONE)
 			return FALSE;
 
-		/* ƒL[‚ğ•ú‚· */
+		/* ã‚­ãƒ¼ã‚’æ”¾ã™ */
 		*press = FALSE;
 		*key = table[(unsigned char )*ch].key;
 		return TRUE;
 	case 3:
-		/* ƒ‚ƒfƒtƒ@ƒCƒAƒL[‚ğ•ú‚· */
+		/* ãƒ¢ãƒ‡ãƒ•ã‚¡ã‚¤ã‚¢ã‚­ãƒ¼ã‚’æ”¾ã™ */
 		if(table[(unsigned char )*ch].mod == BMKEY_NONE)
 			return FALSE;
 
@@ -427,15 +427,29 @@ int getAutoKey(struct Bm2stat *bm2, int *press, char *ch, int *key)
 		autoKeyCount = 0;
 
 		if(*autoKeyPointer == 0) {
-			/* ©“®ƒL[“ü—ÍI—¹ */
+			/* è‡ªå‹•ã‚­ãƒ¼å…¥åŠ›çµ‚äº† */
 			autoKeyPointer = NULL;
 			bm2->fast = FALSE;
 		} else {
-			/* Ÿ‚Ì•¶š‚ÖˆÚ‚é */
+			/* æ¬¡ã®æ–‡å­—ã¸ç§»ã‚‹ */
 			autoKeyPointer++;
 		}
 		return FALSE;
 	}
+}
+
+/*
+	ã‚¹ãƒ†ãƒ¼ãƒˆæ•°ã®å·®ã‚’å¾—ã‚‹
+*/
+int m68diff(int x, int y)
+{
+	x &= 0x7fffffff;
+	y &= 0x7fffffff;
+
+	if(x < y && y - x > 0x40000000)
+		return 0x80000000 - y + x;
+	else
+		return x - y;
 }
 
 /*

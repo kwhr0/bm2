@@ -1,6 +1,6 @@
 /*
-	“ú—§ƒx[ƒVƒbƒNƒ}ƒXƒ^[Jr.ƒGƒ~ƒ…ƒŒ[ƒ^
-	İ’è
+	æ—¥ç«‹ãƒ™ãƒ¼ã‚·ãƒƒã‚¯ãƒã‚¹ã‚¿ãƒ¼Jr.ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿
+	è¨­å®š
 */
 
 #include <stdio.h>
@@ -8,20 +8,21 @@
 #include <string.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <sys/stat.h>
 #include "bm2.h"
 
-/* ƒL[ƒ{[ƒh */
-#define KEYBOARD_EN	0	/* ‰pŒê */
-#define KEYBOARD_JP	1	/* “ú–{Œê */
-#define KEYBOARD_DE	2	/* ƒhƒCƒcŒê */
+/* ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ */
+#define KEYBOARD_EN	0	/* è‹±èª */
+#define KEYBOARD_JP	1	/* æ—¥æœ¬èª */
+#define KEYBOARD_DE	2	/* ãƒ‰ã‚¤ãƒ„èª */
 
-/* ƒL[Š„‚è“–‚Ä */
+/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ */
 struct KeyAssign {
-	int bmkey;	/* MB-6885‰¼‘zƒL[ƒR[ƒh */
-	int key;	/* PCƒL[ƒR[ƒh */
+	int bmkey;	/* MB-6885ä»®æƒ³ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ */
+	int key;	/* PCã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ */
 };
 
-/* ƒIƒvƒVƒ‡ƒ“ y/n */
+/* ã‚ªãƒ—ã‚·ãƒ§ãƒ³ y/n */
 const static OptTable tableYesNo[] = {
 	{ "y", TRUE },
 	{ "yes", TRUE },
@@ -30,14 +31,14 @@ const static OptTable tableYesNo[] = {
 	{ NULL, 0 }
 };
 
-/* ƒIƒvƒVƒ‡ƒ“ RAMƒTƒCƒY */
+/* ã‚ªãƒ—ã‚·ãƒ§ãƒ³ RAMã‚µã‚¤ã‚º */
 const static OptTable tableRam[] = {
 	{ "16k", 0x3fff },
 	{ "64k", 0xffff },
 	{ NULL, 0 }
 };
 
-/* ƒIƒvƒVƒ‡ƒ“ MB-6885‰¼‘zƒL[ƒR[ƒh */
+/* ã‚ªãƒ—ã‚·ãƒ§ãƒ³ MB-6885ä»®æƒ³ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ */
 const static OptTable tableBmkey[] = {
 	{ "z", BMKEY_Z },
 	{ "x", BMKEY_X },
@@ -99,7 +100,7 @@ const static OptTable tableBmkey[] = {
 	{ NULL, 0 }
 };
 
-/* ƒIƒvƒVƒ‡ƒ“ PC‚ÌƒL[ƒ{[ƒh‚Ìí—Ş */
+/* ã‚ªãƒ—ã‚·ãƒ§ãƒ³ PCã®ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®ç¨®é¡ */
 const static OptTable tableKeyboard[] = {
 	{ "en", KEYBOARD_EN },
 	{ "jp", KEYBOARD_JP },
@@ -107,10 +108,10 @@ const static OptTable tableKeyboard[] = {
 	{ NULL, 0 }
 };
 
-/* ƒIƒvƒVƒ‡ƒ“ PC‚ÌƒL[ƒR[ƒh */
+/* ã‚ªãƒ—ã‚·ãƒ§ãƒ³ PCã®ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ */
 static OptTable tableKey[] = {
 	{ "none", KEY_NONE },
-	/* ‰pŒêƒL[ƒ{[ƒh(ƒfƒtƒHƒ‹ƒg) */
+	/* è‹±èªã‚­ãƒ¼ãƒœãƒ¼ãƒ‰(ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ) */
 #define INDEX_TABLE_KEY_BACKSPACE	1
 	{ "backspace", KEY_BACKSPACE },
 #define INDEX_TABLE_KEY_TAB	2
@@ -335,7 +336,7 @@ static OptTable tableKey[] = {
 	{ "menu", KEY_MENU },
 #define INDEX_TABLE_KEY_POWER	112
 	{ "power", KEY_POWER },
-	/* “ú–{ŒêƒL[ƒ{[ƒh */
+	/* æ—¥æœ¬èªã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ */
 #define INDEX_TABLE_KEY_COLON	113
 	{ ":", KEY_QUOTE },
 #define INDEX_TABLE_KEY_AT	114
@@ -352,7 +353,7 @@ static OptTable tableKey[] = {
 	{ "xfer", KEY_XFER },
 #define INDEX_TABLE_NFER	120
 	{ "nfer", KEY_NFER },
-	/* ƒhƒCƒcŒêƒL[ƒ{[ƒh */
+	/* ãƒ‰ã‚¤ãƒ„èªã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ */
 #define INDEX_TABLE_KEY_HASH	121
 	{ "hash", KEY_BACKSLASH },
 #define INDEX_TABLE_KEY_PLUS	122
@@ -370,7 +371,7 @@ static OptTable tableKey[] = {
 	{ NULL, 0 }
 };
 
-/* ƒL[Š„‚è“–‚Ä‚ÌƒfƒtƒHƒ‹ƒg */
+/* ã‚­ãƒ¼å‰²ã‚Šå½“ã¦ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ */
 static struct KeyAssign keyAssign[] = {
 #define INDEX_KEY_ASSIGN_Z	0
 	{ BMKEY_Z, KEY_Z },
@@ -491,7 +492,7 @@ static struct KeyAssign keyAssign[] = {
 	{ 0, 0 }
 };
 
-/* ƒtƒHƒ“ƒg */
+/* ãƒ•ã‚©ãƒ³ãƒˆ */
 static uint8 fontDefault[256][8] = {
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
 	{ 0xff, 0xff, 0xff, 0xff, 0xf0, 0xf0, 0xf0, 0xf0 },
@@ -751,11 +752,16 @@ static uint8 fontDefault[256][8] = {
 	{ 0xff, 0x7e, 0x3c, 0x18, 0x18, 0x3c, 0x7e, 0xff }
 };
 
+static char bin_path[PATH_MAX];
+static int bin_adr;
+static time_t load_time;
+
 /*
-	ƒƒO‚ğo—Í‚·‚é
+	ãƒ­ã‚°ã‚’å‡ºåŠ›ã™ã‚‹
 */
 void m68log(const struct M68stat *m68)
 {
+#if 0
 	char buf[256];
 
 	/*
@@ -764,10 +770,11 @@ void m68log(const struct M68stat *m68)
 	*/
 	printf("%s\n", m68regs(buf, m68));
 	printf("%dclocks\n\n", m68states(m68));
+#endif
 }
 
 /*
-	•¶š—ñ(16i”)‚ğ”’l‚É‚·‚é (getFile‚Ì‰º¿‚¯)
+	æ–‡å­—åˆ—(16é€²æ•°)ã‚’æ•°å€¤ã«ã™ã‚‹ (getFileã®ä¸‹è«‹ã‘)
 */
 static int atoix(const char *buf)
 {
@@ -778,7 +785,7 @@ static int atoix(const char *buf)
 }
 
 /*
-	ƒIƒvƒVƒ‡ƒ“‚©‚çƒtƒ@ƒCƒ‹–¼‚ÆƒAƒhƒŒƒX‚ğ“¾‚é (init‚Ì‰º¿‚¯)
+	ã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‹ã‚‰ãƒ•ã‚¡ã‚¤ãƒ«åã¨ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’å¾—ã‚‹ (initã®ä¸‹è«‹ã‘)
 */
 static int getFile(char **file, int *address, int argc, char *argv[])
 {
@@ -800,7 +807,7 @@ static int getFile(char **file, int *address, int argc, char *argv[])
 }
 
 /*
-	ƒGƒ~ƒ…ƒŒ[ƒ^‚ğ‰Šú‰»‚·‚é (‰º¿‚¯)
+	ã‚¨ãƒŸãƒ¥ãƒ¬ãƒ¼ã‚¿ã‚’åˆæœŸåŒ–ã™ã‚‹ (ä¸‹è«‹ã‘)
 */
 int init(struct Bm2stat *bm2, int argc, char *argv[])
 {
@@ -813,10 +820,10 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 
 	memset(bm2, 0, sizeof(*bm2));
 
-	/* İ’èƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş */
+	/* è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€ */
 	getConfig(conf, sizeof(conf) / sizeof(conf[0]), "bm2config", argc, argv);
 
-	/* ƒfƒBƒXƒvƒŒƒC */
+	/* ãƒ‡ã‚£ã‚¹ãƒ—ãƒ¬ã‚¤ */
 	display = getOptText(conf, "display", "c");
 	if(strcasecmp(display, "color") == 0 || strcasecmp(display, "c") == 0)
 		bm2->display = 0;
@@ -825,12 +832,12 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 	else
 		bm2->display = atoix(display);
 
-	/* CPU‚ğ‰Šú‰»‚·‚é */
+	/* CPUã‚’åˆæœŸåŒ–ã™ã‚‹ */
 	bm2->cpu = m68init(bm2->memory, bm2);
 	if((bm2->cpu_freq = getOptInt(conf, "clock", 750) * 1000) <= 0)
 		bm2->cpu_freq = 750 * 1000;
 
-	/* ƒƒ‚ƒŠ‚ğ‰Šú‰»‚·‚é */
+	/* ãƒ¡ãƒ¢ãƒªã‚’åˆæœŸåŒ–ã™ã‚‹ */
 	bm2->ram_end = getOptTable(conf, "ram_size", tableRam, 0x3fff);
 	for(i = 0x100; i < 0xb000; i++)
 		bm2->memory[i] = (i & 0x0040 ? 0x00: 0xff);
@@ -839,18 +846,18 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 	for(i = 0; i < 0x1000; i++)
 		bm2->memory[i] = (i & 0x0040 ? 0x00: 0xff);
 
-	/* ƒJƒ‰[ƒAƒ_ƒvƒ^‚ğ‰Šú‰»‚·‚é */
+	/* ã‚«ãƒ©ãƒ¼ã‚¢ãƒ€ãƒ—ã‚¿ã‚’åˆæœŸåŒ–ã™ã‚‹ */
 	bm2->mp1710 = getOptTable(conf, "mp1710", tableYesNo, TRUE);
 	for(i = 0; i < sizeof(bm2->color_map); i++)
 		bm2->color_map[i] = rand() & 0xff;
 	bm2->mp1710on = FALSE;
 	bm2->wtenbl = 0;
 
-	/* ƒXƒNƒŠ[ƒ“ƒ‚[ƒh‚ğ‰Šú‰»‚·‚é */
+	/* ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ãƒ¢ãƒ¼ãƒ‰ã‚’åˆæœŸåŒ–ã™ã‚‹ */
 	bm2->screen_mode = 0;
 	bm2->reverse = 0;
 
-	/* ƒL[‚ğ‰Šú‰»‚·‚é */
+	/* ã‚­ãƒ¼ã‚’åˆæœŸåŒ–ã™ã‚‹ */
 	bm2->keyconv[KEY_INSERT] = BMKEY_YEN;
 	bm2->keyconv[KEY_DELETE] = BMKEY_UNDERBAR;
 	switch(getOptTable(conf, "keyboard", tableKeyboard, KEYBOARD_EN)) {
@@ -899,7 +906,7 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 	memset(bm2->key_mat, 0x0f, sizeof(bm2->key_mat));
 	bm2->key_break = FALSE;
 
-	/* ƒTƒEƒ“ƒh‚ğ‰Šú‰»‚·‚é */
+	/* ã‚µã‚¦ãƒ³ãƒ‰ã‚’åˆæœŸåŒ–ã™ã‚‹ */
 	bm2->use_sound = getOptTable(conf, "sound", tableYesNo, TRUE);
 	if(bm2->use_sound) {
 		bm2->sound_sample_size = getSoundSampleSize(60);
@@ -913,13 +920,13 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 	bm2->sound_tape = FALSE;
 	bm2->fast = FALSE;
 
-	/* ƒe[ƒv‚ğ‰Šú‰»‚·‚é */
+	/* ãƒ†ãƒ¼ãƒ—ã‚’åˆæœŸåŒ–ã™ã‚‹ */
 	setTape(bm2, "noname.bin");
 	if(getFile(&file, &address, argc, argv) > 0)
 		if(readSRecord(file, bm2->cpu.m, NULL, 0x10000, FALSE) <= 0)
 			strcpy(bm2->tape_path, file);
 
-	/* ROMƒCƒ[ƒW‚ğ“Ç‚İ‚Ş */
+	/* ROMã‚¤ãƒ¡ãƒ¼ã‚¸ã‚’èª­ã¿è¾¼ã‚€ */
 	setHomeDir(rom_dir, getOptText(conf, "rom_dir", ""));
 	if(strcmp(rom_dir, "") != 0) {
 		bm2->cpu.emulate_subroutine = FALSE;
@@ -950,6 +957,7 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 		memcpy(&bm2->cpu.m[0xb000], bm2->rom_b000_e7ff, 0x3800);
 		memcpy(&bm2->cpu.m[0xf000], bm2->rom_f000_ffff, 0x1000);
 	} else {
+#ifdef CURMPU
 		bm2->cpu.emulate_subroutine = TRUE;
 		bm2->ram_rom = 0x07;
 
@@ -982,34 +990,61 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 		bm2->cpu.m[0xc003] = 0x7e;
 		bm2->cpu.m[0xc004] = 0xc0;
 		bm2->cpu.m[0xc005] = 0x00;
-
 		bm2->cpu.sp = ((uint16 )bm2->cpu.m[0x0008] << 8) | bm2->cpu.m[0x0009];
 		bm2->cpu.cc = 0;
+#else
+		popup("ERROR: Cannot read ROM file. \"%s\"", rom_path);
+		return FALSE;
+#endif
 	}
 
-	/* ƒtƒHƒ“ƒg‚ğ“Ç‚İ‚Ş */
+	/* ãƒ•ã‚©ãƒ³ãƒˆã‚’èª­ã¿è¾¼ã‚€ */
 	sprintf(rom_path, "%s/chr.bmp", rom_dir);
 	if(!loadFontBmp(bm2, rom_path)) {
 		sprintf(rom_path, "%s/font.rom", rom_dir);
 		if(readBin(rom_path, bm2->rom_font, sizeof(bm2->rom_font)) <= 0)
 			memcpy(bm2->rom_font, fontDefault, sizeof(bm2->rom_font));
 	}
-
-	/* ƒgƒŒ[ƒXƒ‚[ƒh‚©? */
+#ifdef CURMPU
+	/* ãƒˆãƒ¬ãƒ¼ã‚¹ãƒ¢ãƒ¼ãƒ‰ã‹? */
 	bm2->cpu.trace = getOptTable(conf, "debug", tableYesNo, FALSE);
-
-	/* ‰æ–Ê‚ÌŠg‘å—¦‚ğİ’è‚·‚é */
+#endif
+	/* ç”»é¢ã®æ‹¡å¤§ç‡ã‚’è¨­å®šã™ã‚‹ */
 	bm2->zoom = getOptInt(conf, "zoom", 2);
 	if(bm2->zoom < 1)
 		bm2->zoom = 1;
 	else if(bm2->zoom > 8)
 		bm2->zoom = 8;
 
-	/* ‘Sƒ‰ƒCƒ“•\¦‚©? */
+	/* å…¨ãƒ©ã‚¤ãƒ³è¡¨ç¤ºã‹? */
 	bm2->full_line = getOptTable(conf, "full_line", tableYesNo, FALSE);
 
-	/* ŠÂ‹«ˆË‘¶•”‚ğ‰Šú‰»‚·‚é */
+	setHomeDir(bin_path, getOptText(conf, "load_bin", ""));
+	bin_adr = getOptHex(conf, "load_bin_adr", 0x4000);
+	loadBinary(bm2);
+
+	/* ç’°å¢ƒä¾å­˜éƒ¨ã‚’åˆæœŸåŒ–ã™ã‚‹ */
 	return initDepend(bm2, argc, argv);
+}
+
+void loadBinary(struct Bm2stat *bm2) {
+	struct stat st;
+	if (*bin_path && !stat(bin_path, &st) && load_time < st.st_mtimespec.tv_sec) {
+		FILE *fi = fopen(bin_path, "rb");
+		if (fi) {
+			int c, i;
+			for (i = bin_adr; i < 0xb000 && (c = getc(fi)) != EOF; i++)
+				bm2->memory[i] = c;
+			fclose(fi);
+			if (bm2->ram_rom) {
+				bm2->cpu.m[0xfffe] = bin_adr >> 8;
+				bm2->cpu.m[0xffff] = bin_adr & 0xff;
+			}
+			fclose(fi);
+			load_time = st.st_mtimespec.tv_sec;
+			reset(bm2);
+		}
+	}
 }
 
 /*

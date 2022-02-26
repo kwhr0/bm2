@@ -1,5 +1,5 @@
 /*
-	İ’èƒtƒ@ƒCƒ‹ˆ—
+	è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«å‡¦ç†
 */
 
 #if !defined(CONF_H)
@@ -8,9 +8,9 @@
 #include <stdio.h>
 
 /*
-	\‘¢‘Ì
+	æ§‹é€ ä½“
 */
-/* •¶š—ñ<->”’l•ÏŠ·ƒe[ƒuƒ‹ */
+/* æ–‡å­—åˆ—<->æ•°å€¤å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ« */
 typedef struct {
 	const char *string;
 	int value;
@@ -24,7 +24,7 @@ typedef struct {
 } Conf;
 
 /*
-	ŠÖ”ƒvƒƒgƒ^ƒCƒv
+	é–¢æ•°ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—
 */
 Conf *getConfig(Conf *, int, const char *, int , char *[]);
 const char *getOptText(const Conf *, const char *, const char *);
