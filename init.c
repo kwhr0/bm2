@@ -926,6 +926,10 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 		if(readSRecord(file, bm2->cpu.m, NULL, 0x10000, FALSE) <= 0)
 			strcpy(bm2->tape_path, file);
 
+	setHomeDir(bin_path, getOptText(conf, "load_bin", ""));
+	bin_adr = getOptHex(conf, "load_bin_adr", 0x4000);
+	loadBinary(bm2);
+
 	/* ROMイメージを読み込む */
 	setHomeDir(rom_dir, getOptText(conf, "rom_dir", ""));
 	if(strcmp(rom_dir, "") != 0) {
@@ -993,8 +997,10 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 		bm2->cpu.sp = ((uint16 )bm2->cpu.m[0x0008] << 8) | bm2->cpu.m[0x0009];
 		bm2->cpu.cc = 0;
 #else
-		popup("ERROR: Cannot read ROM file. \"%s\"", rom_path);
-		return FALSE;
+		if (!*bin_path) {
+			popup("ERROR: Cannot read ROM file. \"%s\"", rom_path);
+			return FALSE;
+		}
 #endif
 	}
 
@@ -1018,10 +1024,6 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 
 	/* 全ライン表示か? */
 	bm2->full_line = getOptTable(conf, "full_line", tableYesNo, FALSE);
-
-	setHomeDir(bin_path, getOptText(conf, "load_bin", ""));
-	bin_adr = getOptHex(conf, "load_bin_adr", 0x4000);
-	loadBinary(bm2);
 
 	/* 環境依存部を初期化する */
 	return initDepend(bm2, argc, argv);
