@@ -439,7 +439,7 @@ int HD6303::ResolvC() {
 		case FLEFT:
 			return (p->b >> 7 & 1) << LC;
 		case FLEFT16:
-			return (p->b >> 15 & 1) << LC;
+			return p->b >> 15 << LC;
 		case FRIGHT: case FRIGHT16:
 			return (p->b & 1) << LC;
 		case FDAA:
@@ -541,7 +541,7 @@ int HD6303::ResolvH() {
 		case FB:
 			return p->b & MH;
 		case FADD:
-			return ((p->s & p->b) | (~p->a & p->b) | (p->s & ~p->a)) << 2 & MH;
+			return ((p->s & p->b) | (~p->a & p->b) | (p->s & ~p->a)) << (LH - 3) & MH;
 		default:
 			error();
 			break;

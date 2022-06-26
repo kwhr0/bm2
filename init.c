@@ -1031,7 +1031,7 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 
 void loadBinary(struct Bm2stat *bm2) {
 	struct stat st;
-	if (*bin_path && !stat(bin_path, &st) && load_time < st.st_mtimespec.tv_sec) {
+	if (*bin_path && !stat(bin_path, &st) && load_time < st.st_mtime) {
 		FILE *fi = fopen(bin_path, "rb");
 		if (fi) {
 			int c, i;
@@ -1042,8 +1042,7 @@ void loadBinary(struct Bm2stat *bm2) {
 				bm2->cpu.m[0xfffe] = bin_adr >> 8;
 				bm2->cpu.m[0xffff] = bin_adr & 0xff;
 			}
-			fclose(fi);
-			load_time = st.st_mtimespec.tv_sec;
+			load_time = st.st_mtime;
 			reset(bm2);
 		}
 	}
