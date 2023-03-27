@@ -1,5 +1,5 @@
 // HD6303
-// Copyright 2022 © Yasuo Kuwahara
+// Copyright 2022,2023 © Yasuo Kuwahara
 // MIT License
 
 #include "HD6303.h"

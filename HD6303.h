@@ -1,5 +1,5 @@
 // HD6303
-// Copyright 2022 © Yasuo Kuwahara
+// Copyright 2022,2023 © Yasuo Kuwahara
 // MIT License
 
 #include "test.h"	// bm2
@@ -67,28 +67,28 @@ private:
 		HD6303_TRACE_LOG(adr, data, acsStore16);
 	}
 	// customize for bm2 -- end
-	template<typename F> void rimm(F func) { func(imm8()); clock += 2; };
-	template<typename F> void rimm16(F func) { func(imm16()); clock += 3; };
-	template<typename F> void ma(F func) { acc[1] = func(acc[1]); clock++; };
-	template<typename F> void mb(F func) { acc[0] = func(acc[0]); clock++; };
-	template<typename F> void rext(F func) { func(ld8(imm16())); clock += 4; };
-	template<typename F> void rext16(F func) { func(ld16(imm16())); clock += 5; };
-	template<typename F> void wext(F func) { st8(imm16(), func()); clock += 4; };
-	template<typename F> void wext16(F func) { st16(imm16(), func()); clock += 5; };
-	template<typename F> void mext(F func) { uint16_t t = imm16(); st8(t, func(ld8(t))); clock += 6; };
-	template<typename F> void rdir(F func) { func(ld8(imm8())); clock += 3; };
-	template<typename F> void rdirb(F func) { uint8_t i = imm8(); func(ld8(imm8()), i); clock += 4; };
-	template<typename F> void rdir16(F func) { func(ld16(imm8())); clock += 4; };
-	template<typename F> void wdir(F func) { st8(imm8(), func()); clock += 3; };
-	template<typename F> void wdir16(F func) { st16(imm8(), func()); clock += 4; };
-	template<typename F> void mdirb(F func) { uint8_t i = imm8(), t = imm8(); st8(t, func(ld8(t), i)); clock += 6; };
-	template<typename F> void rind(F func) { func(ld8(imm8() + ix)); clock += 4; };
-	template<typename F> void rindb(F func) { uint8_t i = imm8(); func(ld8(imm8() + ix), i); clock += 5; };
-	template<typename F> void rind16(F func) { func(ld16(imm8() + ix)); clock += 5; };
-	template<typename F> void wind(F func) { st8(imm8() + ix, func()); clock += 4; };
-	template<typename F> void wind16(F func) { st16(imm8() + ix, func()); clock += 5; };
-	template<typename F> void mind(F func) { uint16_t t = imm8() + ix; st8(t, func(ld8(t))); clock += 6; };
-	template<typename F> void mindb(F func) { uint8_t i = imm8(); uint16_t t = imm8() + ix; st8(t, func(ld8(t), i)); clock += 7; };
+	template<typename F> void rimm(F func) { func(imm8()); clock += 2; }
+	template<typename F> void rimm16(F func) { func(imm16()); clock += 3; }
+	template<typename F> void ma(F func) { acc[1] = func(acc[1]); clock++; }
+	template<typename F> void mb(F func) { acc[0] = func(acc[0]); clock++; }
+	template<typename F> void rext(F func) { func(ld8(imm16())); clock += 4; }
+	template<typename F> void rext16(F func) { func(ld16(imm16())); clock += 5; }
+	template<typename F> void wext(F func) { st8(imm16(), func()); clock += 4; }
+	template<typename F> void wext16(F func) { st16(imm16(), func()); clock += 5; }
+	template<typename F> void mext(F func) { uint16_t t = imm16(); st8(t, func(ld8(t))); clock += 6; }
+	template<typename F> void rdir(F func) { func(ld8(imm8())); clock += 3; }
+	template<typename F> void rdirb(F func) { uint8_t i = imm8(); func(ld8(imm8()), i); clock += 4; }
+	template<typename F> void rdir16(F func) { func(ld16(imm8())); clock += 4; }
+	template<typename F> void wdir(F func) { st8(imm8(), func()); clock += 3; }
+	template<typename F> void wdir16(F func) { st16(imm8(), func()); clock += 4; }
+	template<typename F> void mdirb(F func) { uint8_t i = imm8(), t = imm8(); st8(t, func(ld8(t), i)); clock += 6; }
+	template<typename F> void rind(F func) { func(ld8(imm8() + ix)); clock += 4; }
+	template<typename F> void rindb(F func) { uint8_t i = imm8(); func(ld8(imm8() + ix), i); clock += 5; }
+	template<typename F> void rind16(F func) { func(ld16(imm8() + ix)); clock += 5; }
+	template<typename F> void wind(F func) { st8(imm8() + ix, func()); clock += 4; }
+	template<typename F> void wind16(F func) { st16(imm8() + ix, func()); clock += 5; }
+	template<typename F> void mind(F func) { uint16_t t = imm8() + ix; st8(t, func(ld8(t))); clock += 6; }
+	template<typename F> void mindb(F func) { uint8_t i = imm8(); uint16_t t = imm8() + ix; st8(t, func(ld8(t), i)); clock += 7; }
 	int ResolvC();
 	int ResolvV();
 	int ResolvZ();
