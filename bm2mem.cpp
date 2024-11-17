@@ -14,7 +14,7 @@
 extern HD6303 hd6303;
 
 struct CP : CompareProcess {
-#if M6800_TRACE
+#if HD6303_TRACE
 	void Stop() { hd6303.StopTrace(); }
 #endif
 } cp;

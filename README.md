@@ -1,5 +1,5 @@
-OS X 10.7以上  
-Xcode 4.6以上  
+macOS10.13以上  
+Xcode10以上  
 Intel/Apple Silicon  
 
 オリジナルはこちらです。  
