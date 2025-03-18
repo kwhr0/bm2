@@ -1,5 +1,5 @@
 // HD6303
-// Copyright 2022-2024 © Yasuo Kuwahara
+// Copyright 2022-2025 © Yasuo Kuwahara
 // MIT License
 
 #include "HD6303.h"
@@ -7,51 +7,20 @@
 #include <cstdlib>
 #include <cstring>
 
-enum {
-	LC, LV, LZ, LN, LI, LH
-};
-
-enum {
-	MC = 1 << LC, MV = 1 << LV, MZ = 1 << LZ, MN = 1 << LN, MI = 1 << LI, MH = 1 << LH
-};
-
-enum {
-	F0 = 1, F1, F8, F16, FADD, FADD16, FSUB, FSUB16, FLEFT, FLEFT16, FRIGHT, FRIGHT16, FDAA
-};
-
-#define F(flag, type)	flag##type = F##type << (L##flag << 2)
-enum {
-	F(C, 0), F(C, 1), F(C, ADD), F(C, ADD16), F(C, SUB), F(C, SUB16),
-	F(C, LEFT), F(C, LEFT16), F(C, RIGHT), F(C, RIGHT16), F(C, DAA),
-	F(V, 0), F(V, 1), F(V, ADD), F(V, ADD16), F(V, SUB), F(V, SUB16),
-	F(V, LEFT), F(V, LEFT16), F(V, RIGHT), F(V, RIGHT16),
-	F(Z, 1), F(Z, 8), F(Z, 16),
-	F(N, 0), F(N, 8), F(N, 16),
-	F(H, ADD)
-};
-
 #define fclc()			fset<C0>()
 #define fsec()			fset<C1>()
 #define fclv()			fset<V0>()
 #define fsev()			fset<V1>()
 #define fclr()			fset<N0 | Z1 | V0 | C0>()
-#define fld(a)			fset<N8 | Z8 | V0>(a)
-#define fld16(a)		fset<N16 | Z16 | V0>(a)
-#define ftst(a)			fset<N8 | Z8 | V0 | C0>(a)
-#define fcom(a)			fset<N8 | Z8 | V0 | C1>(a)
-#define fadd(a, d, s)	fset<HADD | N8 | Z8 | VADD | CADD>(a, d, s)
-#define fadd16(a, d, s)	fset<N16 | Z16 | VADD16 | CADD16>(a, d, s)
-#define fsub(a, d, s)	fset<N8 | Z8 | VSUB | CSUB>(a, d, s)
-#define fsub16(a, d, s)	fset<N16 | Z16 | VSUB16 | CSUB16>(a, d, s)
-#define fcpx(a, d, s)	fset<N16 | Z16 | VSUB16>(a, d, s)
-#define finc(a, d)		fset<N8 | Z8 | VADD>(a, d, 1)
-#define fdec(a, d)		fset<N8 | Z8 | VSUB>(a, d, 1)
-#define fz16(a)			fset<Z16>(a)
-#define fleft(a, d)		fset<N8 | Z8 | VLEFT | CLEFT>(a, d)
-#define fleft16(a, d)	fset<N16 | Z16 | VLEFT16 | CLEFT16>(a, d)
-#define fright(a, d)	fset<N8 | Z8 | VRIGHT | CRIGHT>(a, d)
-#define fright16(a, d)	fset<N16 | Z16 | VRIGHT16 | CRIGHT16>(a, d)
-#define fdaa(a, d)		fset<N8 | Z8 | CDAA>(a, d)
+#define ftst(a)			fset<NDEF | ZDEF | V0 | C0>(a)
+#define fcom(a)			fset<NDEF | ZDEF | V0 | C1>(a)
+#define fadd(a, d, s)	fset<HADD | NDEF | ZDEF | VADD | CADD>(a, d, s)
+#define fadd16(a, d, s)	fset<NDEF | ZDEF | VADD | CADD, 1>(a, d, s)
+#define fcpx(a, d, s)	fset<NDEF | ZDEF | VSUB, 1>(a, d, s)
+#define finc(a, d)		fset<NDEF | ZDEF | VADD>(a, d, 1)
+#define fdec(a, d)		fset<NDEF | ZDEF | VSUB>(a, d, 1)
+#define fz16(a)			fset<ZDEF, 1>(a)
+#define fdaa(a, d)		fset<NDEF | ZDEF | CDAA>(a, d)
 
 #define CY				(ccr & 1)
 
@@ -79,14 +48,14 @@ void HD6303::Reset() {
 int HD6303::Execute(int n) {
 	auto lda = [&](u8 s) { fld(A = s); };
 	auto ldb = [&](u8 s) { fld(B = s); };
-	auto ldd = [&](u16 s) { fld16(D = s); };
-	auto lds = [&](u16 s) { fld16(sp = s); };
-	auto ldx = [&](u16 s) { fld16(ix = s); };
+	auto ldd = [&](u16 s) { fld<1>(D = s); };
+	auto lds = [&](u16 s) { fld<1>(sp = s); };
+	auto ldx = [&](u16 s) { fld<1>(ix = s); };
 	auto sta = [&] { fld(A); return A; };
 	auto stb = [&] { fld(B); return B; };
-	auto std = [&] { fld16(D); return D; };
-	auto sts = [&] { fld16(sp); return sp; };
-	auto stx = [&] { fld16(ix); return ix; };
+	auto std = [&] { fld<1>(D); return D; };
+	auto sts = [&] { fld<1>(sp); return sp; };
+	auto stx = [&] { fld<1>(ix); return ix; };
 	auto clr = [&] { fclr(); return 0; };
 	auto adda = [&](u8 s) { A = fadd(A + s, A, s); };
 	auto addb = [&](u8 s) { B = fadd(B + s, B, s); };
@@ -95,7 +64,7 @@ int HD6303::Execute(int n) {
 	auto adcb = [&](u8 s) { B = fadd(B + s + CY, B, s); };
 	auto suba = [&](u8 s) { A = fsub(A - s, A, s); };
 	auto subb = [&](u8 s) { B = fsub(B - s, B, s); };
-	auto subd = [&](u16 s) { D = fsub16(D - s, D, s); };
+	auto subd = [&](u16 s) { D = fsub<1>(D - s, D, s); };
 	auto sbca = [&](u8 s) { A = fsub(A - s - CY, A, s); };
 	auto sbcb = [&](u8 s) { B = fsub(B - s - CY, B, s); };
 	auto cmpa = [&](u8 s) { fsub(A - s, A, s); };
@@ -162,8 +131,8 @@ int HD6303::Execute(int n) {
 		u16 t16;
 		switch (imm8()) {
 			case 0x01: clock++; break;
-			case 0x04: D = fright16(D >> 1, D); clock++; break;
-			case 0x05: D = fleft16(D << 1, D); clock++; break;
+			case 0x04: D = fright<1>(D >> 1, D); clock++; break;
+			case 0x05: D = fleft<1>(D << 1, D); clock++; break;
 			case 0x06: ccr = A | 0xc0; clock++; break;
 			case 0x07: A = ccr; clock++; break;
 			case 0x08: fz16(++ix); clock++; break;
@@ -409,103 +378,29 @@ int HD6303::Execute(int n) {
 	return clock - n;
 }
 
-template<int M> HD6303::u16 HD6303::fset(u16 a, u16 d, u16 s) {
-	if constexpr ((M & 0xf) == C0)
-		ccr &= ~MC;
-	if constexpr ((M & 0xf) == C1)
-		ccr |= MC;
-	if constexpr ((M & 0xf) == CADD) {
-		if (((s & d) | (~a & d) | (s & ~a)) & 0x80) ccr |= MC;
-		else ccr &= ~MC;
-	}
-	if constexpr ((M & 0xf) == CADD16) {
-		if (((s & d) | (~a & d) | (s & ~a)) & 0x8000) ccr |= MC;
-		else ccr &= ~MC;
-	}
-	if constexpr ((M & 0xf) == CSUB) {
-		if (((s & ~d) | (a & ~d) | (s & a)) & 0x80) ccr |= MC;
-		else ccr &= ~MC;
-	}
-	if constexpr ((M & 0xf) == CSUB16) {
-		if (((s & ~d) | (a & ~d) | (s & a)) & 0x8000) ccr |= MC;
-		else ccr &= ~MC;
-	}
-	if constexpr ((M & 0xf) == CLEFT) {
-		if (d & 0x80) ccr |= MC;
-		else ccr &= ~MC;
-	}
-	if constexpr ((M & 0xf) == CLEFT16) {
-		if (d & 0x8000) ccr |= MC;
-		else ccr &= ~MC;
-	}
-	if constexpr ((M & 0xf) == CRIGHT || (M & 0xf) == CRIGHT16) {
-		if (d & 1) ccr |= MC;
-		else ccr &= ~MC;
-	}
-	if constexpr ((M & 0xf) == CDAA) {
-		if (d >= 0x60) ccr |= MC;
-		else ccr &= ~MC;
-	}
-	if constexpr ((M & 0xf0) == V0)
-		ccr &= ~MV;
-	if constexpr ((M & 0xf0) == V1)
-		ccr |= MV;
-	if constexpr ((M & 0xf0) == VADD) {
-		if (((d & s & ~a) | (~d & ~s & a)) & 0x80) ccr |= MV;
-		else ccr &= ~MV;
-	}
-	if constexpr ((M & 0xf0) == VADD16) {
-		if (((d & s & ~a) | (~d & ~s & a)) & 0x8000) ccr |= MV;
-		else ccr &= ~MV;
-	}
-	if constexpr ((M & 0xf0) == VSUB) {
-		if (((d & ~s & ~a) | (~d & s & a)) & 0x80) ccr |= MV;
-		else ccr &= ~MV;
-	}
-	if constexpr ((M & 0xf0) == VSUB16) {
-		if (((d & ~s & ~a) | (~d & s & a)) & 0x8000) ccr |= MV;
-		else ccr &= ~MV;
-	}
-	if constexpr ((M & 0xf0) == VLEFT) {
-		if ((d ^ a) & 0x80) ccr |= MV;
-		else ccr &= ~MV;
-	}
-	if constexpr ((M & 0xf0) == VLEFT16) {
-		if ((d ^ a) & 0x8000) ccr |= MV;
-		else ccr &= ~MV;
-	}
-	if constexpr ((M & 0xf0) == VRIGHT) {
-		if ((d ^ a >> 7) & 1) ccr |= MV;
-		else ccr &= ~MV;
-	}
-	if constexpr ((M & 0xf0) == VRIGHT16) {
-		if ((d ^ a >> 15) & 1) ccr |= MV;
-		else ccr &= ~MV;
-	}
-	if constexpr ((M & 0xf00) == Z1)
-		ccr |= MZ;
-	if constexpr ((M & 0xf00) == Z8) {
-		if (a & 0xff) ccr &= ~MZ;
-		else ccr |= MZ;
-	}
-	if constexpr ((M & 0xf00) == Z16) {
-		if (a) ccr &= ~MZ;
-		else ccr |= MZ;
-	}
-	if constexpr ((M & 0xf000) == N0)
-		ccr &= ~MN;
-	if constexpr ((M & 0xf000) == N8) {
-		if (a & 0x80) ccr |= MN;
-		else ccr &= ~MN;
-	}
-	if constexpr ((M & 0xf000) == N16) {
-		if (a & 0x8000) ccr |= MN;
-		else ccr &= ~MN;
-	}
-	if constexpr ((M & 0xf00000) == HADD) {
-		if (((s & d) | (~a & d) | (s & ~a)) & 8) ccr |= MH;
-		else ccr &= ~MH;
-	}
+#define MSB_N	((8 << S) - 1)
+#define MSB		(1 << MSB_N)
+#define MASK	((1 << (8 << S)) - 1)
+
+template<int M, int S> HD6303::u16 HD6303::fset(u16 a, u16 d, u16 s) {
+	if constexpr ((M & 0xf) == C0) ccr &= ~MC;
+	if constexpr ((M & 0xf) == C1) ccr |= MC;
+	if constexpr ((M & 0xf) == CADD) ccr = ((s & d) | (~a & d) | (s & ~a)) & MSB ? ccr | MC : ccr & ~MC;
+	if constexpr ((M & 0xf) == CSUB) ccr = ((s & ~d) | (a & ~d) | (s & a)) & MSB ? ccr | MC : ccr & ~MC;
+	if constexpr ((M & 0xf) == CLEFT) ccr = d & MSB ? ccr | MC : ccr & ~MC;
+	if constexpr ((M & 0xf) == CRIGHT) ccr = d & 1 ? ccr | MC : ccr & ~MC;
+	if constexpr ((M & 0xf) == CDAA) ccr = d >= 0x60 ? ccr | MC : ccr & ~MC;
+	if constexpr ((M & 0xf0) == V0) ccr &= ~MV;
+	if constexpr ((M & 0xf0) == V1) ccr |= MV;
+	if constexpr ((M & 0xf0) == VADD) ccr = ((d & s & ~a) | (~d & ~s & a)) & MSB ? ccr | MV : ccr & ~MV;
+	if constexpr ((M & 0xf0) == VSUB) ccr = ((d & ~s & ~a) | (~d & s & a)) & MSB ? ccr | MV : ccr & ~MV;
+	if constexpr ((M & 0xf0) == VLEFT) ccr = (d ^ a) & MSB ? ccr | MV : ccr & ~MV;
+	if constexpr ((M & 0xf0) == VRIGHT) ccr = (d ^ a >> MSB_N) & 1 ? ccr | MV : ccr & ~MV;
+	if constexpr ((M & 0xf00) == Z1) ccr |= MZ;
+	if constexpr ((M & 0xf00) == ZDEF) ccr = a & MASK ? ccr & ~MZ : ccr | MZ;
+	if constexpr ((M & 0xf000) == N0) ccr &= ~MN;
+	if constexpr ((M & 0xf000) == NDEF) ccr = a & MSB ? ccr | MN : ccr & ~MN;
+	if constexpr ((M & 0xf00000) == HADD) ccr = ((s & d) | (~a & d) | (s & ~a)) & 8 ? ccr | MH : ccr & ~MH;
 	return a;
 }
 

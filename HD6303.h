@@ -1,5 +1,5 @@
 // HD6303
-// Copyright 2022-2024 © Yasuo Kuwahara
+// Copyright 2022-2025 © Yasuo Kuwahara
 // MIT License
 
 #include "test.h"	// bm2
@@ -19,6 +19,26 @@ class HD6303 {
 	using u8 = uint8_t;
 	using u16 = uint16_t;
 	enum { M_IRQ = 1, M_NMI };
+	enum {
+		LC, LV, LZ, LN, LI, LH
+	};
+	enum {
+		MC = 1 << LC, MV = 1 << LV, MZ = 1 << LZ, MN = 1 << LN, MI = 1 << LI, MH = 1 << LH
+	};
+	enum {
+		F0 = 1, F1, FDEF, FADD, FSUB, FLEFT, FRIGHT, FDAA
+	};
+#define F(flag, type)	flag##type = F##type << (L##flag << 2)
+	enum {
+		F(C, 0), F(C, 1), F(C, ADD), F(C, SUB),
+		F(C, LEFT), F(C, RIGHT), F(C, DAA),
+		F(V, 0), F(V, 1), F(V, ADD), F(V, SUB),
+		F(V, LEFT), F(V, RIGHT),
+		F(Z, 1), F(Z, DEF),
+		F(N, 0), F(N, DEF),
+		F(H, ADD)
+	};
+#undef F
 public:
 	HD6303();
 	void Reset();
@@ -69,6 +89,11 @@ private:
 		HD6303_TRACE_LOG(adr, data, acsStore16);
 	}
 	// customize for bm2 -- end
+	template<int S = 0> void fld(u16 a) { fset<NDEF | ZDEF | V0, S>(a); }
+	template<int S = 0> u16 fsub(u16 a, u16 d, u16 s) { return fset<NDEF | ZDEF | VSUB | CSUB, S>(a, d, s); }
+	template<int S = 0> u16 fleft(u16 a, u16 d) { return fset<NDEF | ZDEF | VLEFT | CLEFT, S>(a, d); }
+	template<int S = 0> u16 fright(u16 a, u16 d) { return fset<NDEF | ZDEF | VRIGHT | CRIGHT, S>(a, d); }
+	//
 	template<typename F> void rimm(F func) { func(imm8()); clock += 2; }
 	template<typename F> void rimm16(F func) { func(imm16()); clock += 3; }
 	template<typename F> void ma(F func) { acc[1] = func(acc[1]); clock++; }
@@ -91,7 +116,7 @@ private:
 	template<typename F> void wind16(F func) { st16(imm8() + ix, func()); clock += 5; }
 	template<typename F> void mind(F func) { u16 t = imm8() + ix; st8(t, func(ld8(t))); clock += 6; }
 	template<typename F> void mindb(F func) { u8 i = imm8(); u16 t = imm8() + ix; st8(t, func(ld8(t), i)); clock += 7; }
-	template<int M> u16 fset(u16 a = 0, u16 d = 0, u16 s = 0);
+	template<int M, int S = 0> u16 fset(u16 a = 0, u16 d = 0, u16 s = 0);
 	u8 ccr, irq, waitflags;
 	u8 acc[2];
 	u16 pc, sp, ix;
