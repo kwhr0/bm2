@@ -926,12 +926,17 @@ int init(struct Bm2stat *bm2, int argc, char *argv[])
 		if(readSRecord(file, bm2->cpu.m, NULL, 0x10000, FALSE) <= 0)
 			strcpy(bm2->tape_path, file);
 
+	setHomeDir(rom_dir, getOptText(conf, "rom_dir", ""));
+	if (!*rom_dir)
+		bm2->ram_rom = 7; // ROMが指定されていなければ全てRAMに設定する
+
 	setHomeDir(bin_path, getOptText(conf, "load_bin", ""));
 	bin_adr = getOptHex(conf, "load_bin_adr", 0x4000);
 	loadBinary(bm2);
+	if (!*rom_dir)
+		memcpy(bm2->ram_b000_e7ff, &bm2->cpu.m[0xb000], sizeof(bm2->ram_b000_e7ff));
 
 	/* ROMイメージを読み込む */
-	setHomeDir(rom_dir, getOptText(conf, "rom_dir", ""));
 	if(strcmp(rom_dir, "") != 0) {
 		bm2->cpu.emulate_subroutine = FALSE;
 		bm2->ram_rom = 0x00;
@@ -1035,7 +1040,7 @@ void loadBinary(struct Bm2stat *bm2) {
 		FILE *fi = fopen(bin_path, "rb");
 		if (fi) {
 			int c, i;
-			for (i = bin_adr; i < 0xb000 && (c = getc(fi)) != EOF; i++)
+			for (i = bin_adr; i < 0xe800 && (c = getc(fi)) != EOF; i++)
 				bm2->memory[i] = c;
 			fclose(fi);
 			if (bm2->ram_rom) {

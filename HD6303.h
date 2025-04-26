@@ -18,6 +18,7 @@ class HD6303 {
 	using s8 = int8_t;
 	using u8 = uint8_t;
 	using u16 = uint16_t;
+	enum { W_WAI = 1, W_SLP };
 	enum { M_IRQ = 1, M_NMI };
 	enum {
 		LC, LV, LZ, LN, LI, LH
@@ -43,6 +44,7 @@ public:
 	HD6303();
 	void Reset();
 	int Execute(int n);
+	bool isWaiting() const { return waitflags; }
 	u16 GetPC() const { return pc; }
 	void IRQ() { irq |= M_IRQ; }
 	void NMI() { irq |= M_NMI; }
@@ -123,7 +125,7 @@ private:
 	int clock;
 #if HD6303_TRACE
 	static constexpr int TRACEMAX = 10000;
-	static constexpr int ACSMAX = 2;
+	static constexpr int ACSMAX = 5;
 	static constexpr int OPMAX = 3;
 	enum {
 		acsStore8 = 4, acsStore16, acsLoad8, acsLoad16

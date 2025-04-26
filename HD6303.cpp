@@ -28,8 +28,6 @@
 #define B				acc[0]
 #define D				((u16 &)acc[0])
 
-enum { W_WAI = 1, W_SLEEP };
-
 HD6303::HD6303() {
 #if HD6303_TRACE
 	memset(tracebuf, 0, sizeof(tracebuf));
@@ -108,19 +106,16 @@ int HD6303::Execute(int n) {
 	clock = 0;
 	do {
 		if (irq) {
-			if (irq & M_NMI) {
-				irq &= ~M_NMI;
-				pshs();
-				ccr |= MI;
+			if (waitflags & W_SLP) {
 				waitflags = 0;
-				pc = ld16(0xfffc);
+				pc++;
 			}
-			else if (irq & M_IRQ && !(ccr & MI)) {
-				irq &= ~M_IRQ;
-				pshs();
-				ccr |= MI;
+			if (int nmi = irq & M_NMI; nmi || !(ccr & MI)) {
+				irq &= ~(nmi ? M_NMI : M_IRQ);
+				if (!(waitflags & W_WAI)) pshs();
 				waitflags = 0;
-				pc = ld16(0xfff8);
+				ccr |= MI;
+				pc = ld16(nmi ? 0xfffc : 0xfff8);
 			}
 		}
 #if HD6303_TRACE
@@ -149,7 +144,7 @@ int HD6303::Execute(int n) {
 			case 0x17: fld(A = B); clock++; break;
 			case 0x18: t16 = D; D = ix; ix = t16; clock += 2; break;
 			case 0x19: daa(); clock += 2; break;
-			case 0x1a: waitflags |= W_SLEEP; pc--; return 0;
+			case 0x1a: waitflags |= W_SLP; pc--; clock += 4; return clock - n;
 			case 0x1b: A = fadd(A + B, A, B); clock++; break;
 			case 0x20: br(1); break;
 			case 0x21: br(0); break;
@@ -182,7 +177,7 @@ int HD6303::Execute(int n) {
 			case 0x3c: st16r(--sp, ix); --sp; clock += 5; break;
 			case 0x3d: D = A * B; clock += 7; break;
 			case 0x3e: if (!(waitflags & W_WAI)) { pshs(); waitflags |= W_WAI; }
-				pc--; return 0;
+				pc--; clock += 9; return clock - n;
 			case 0x3f: pshs(); ccr |= MI; pc = ld16(0xfffa); clock += 12; break; // swi
 			case 0x40: ma(neg); break;
 			case 0x43: ma(com); break;

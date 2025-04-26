@@ -110,6 +110,9 @@ int main(int argc, char *argv[])
 #endif
 			nmi = gNMI;
 			gNMI = false;
+#ifdef NEWMPU
+			if (hd6303.isWaiting()) gStates = 0;
+#endif
 		}
 		gTotalStates -= gStates;
 		/* 画面を更新する */
